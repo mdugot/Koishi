@@ -9,5 +9,6 @@ class Sigmoid : public Transformation {
     public:
         Sigmoid(Number *base);
         float eval();
+        float derivate(Variable *from);
 };
 #endif

@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "operation/variable.h"
 #include "operation/addition.h"
+#include "operation/multiplication.h"
 #include "operation/sigmoid.h"
 
 int main(int argc, char **argv) {
@@ -19,8 +20,10 @@ int main(int argc, char **argv) {
     
     Variable v1(3);
     Variable v2(-2);
-    Addition add(&v1, &v2);
-    Sigmoid sig(&add);
+    Multiplication mul(&v1, &v2);
+    Sigmoid sig(&mul);
     DEBUG << "result : " << sig.eval() << NL;
+    DEBUG << "derivate 1 : " << sig.derivate(&v1) << NL;
+    DEBUG << "derivate 2 : " << sig.derivate(&v2) << NL;
     
 }

@@ -10,6 +10,7 @@ class Variable : public Number {
     public:
         Variable(float value);
         float eval();
+        float derivate(Variable *from);
 
 };
 #endif

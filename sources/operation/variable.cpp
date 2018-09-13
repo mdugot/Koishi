@@ -9,3 +9,8 @@ float Variable::eval() {
     return value;
 }
 
+float Variable::derivate(Variable *from) {
+    if (from == this)
+        return 1;
+    return 0;
+}

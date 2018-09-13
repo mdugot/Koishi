@@ -2,6 +2,8 @@
 #define NUMBER_H
 #include "utils.h"
 
+class Variable;
+
 class Number {
 
     protected:
@@ -9,6 +11,6 @@ class Number {
     public:
         Number();
         virtual float eval() = 0;
-//        virtual float derivate(Variable *respectOf);
+        virtual float derivate(Variable *from) = 0;
 };
 #endif
