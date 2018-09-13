@@ -1,11 +1,14 @@
+#ifndef NUMBER_H
+#define NUMBER_H
 #include "utils.h"
 
-virtual class Number {
+class Number {
 
     protected:
 
     public:
         Number();
-        virtual float eval();
-        virtual float derivate(Operation *respectOf);
-}
+        virtual float eval() = 0;
+//        virtual float derivate(Variable *respectOf);
+};
+#endif

@@ -1,11 +1,15 @@
-#include "utils.h"
+#ifndef OPERATION_H
+#define OPERATION_H
+#include "operation/number.h"
 
-virtual class Operation : Number {
+class Operation : public Number {
 
     protected:
-        Operation *left;
-        Operation *right;
+        Number *left;
+        Number *right;
 
     public:
-        Operation(Operation *previous);
-}
+        Operation(Number *left, Number *right);
+};
+
+#endif

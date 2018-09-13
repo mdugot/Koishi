@@ -1,11 +1,13 @@
-#include "utils.h"
+#ifndef TRANSFORMATION_H
+#define TRANSFORMATION_H
+#include "operation/number.h"
 
-virtual class Transformation : Number {
+class Transformation : public Number {
 
     protected:
-        Operation *base;
+        Number *base;
 
     public:
-        Transformation(Operation *previous);
-}
-
+        Transformation(Number *base);
+};
+#endif

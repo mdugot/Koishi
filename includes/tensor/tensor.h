@@ -1,6 +1,9 @@
+#ifndef TENSOR_H
+#define TENSOR_H
 #include "utils.h"
 
-virtual class Tensor {
+class Tensor {
     
 
-}
+};
+#endif

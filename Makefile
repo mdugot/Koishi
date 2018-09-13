@@ -26,7 +26,7 @@ $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) -o $(NAME) -I$(INC_PATH) $(OBJ)
 	@printf "\033[2K[ \033[31mcompiling\033[0m ] $< \r"
 
-$(OBJ): $(SRC)
+obj/%.o: sources/%.cpp
 	@$(CC) -I$(INC_PATH) $(CFLAGS) -o $@ -c $<
 	@printf " \033[2K[ \033[31mcompiling\033[0m ] $< \r"
 

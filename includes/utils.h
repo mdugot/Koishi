@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <math.h>
 #include <fstream>
 #include <queue>
 #include <stack>
