@@ -1,13 +1,13 @@
-#ifndef MULTIPLICATION_H
-#define MULTIPLICATION_H
+#ifndef POW_H
+#define POW_H
 #include "operation/operation.h"
 
-class Multiplication : public Operation {
+class Pow : public Operation {
 
     protected:
 
     public:
-        Multiplication(Number *left, Number *right);
+        Pow(Number *left, Number *right);
         float eval();
         virtual float leftDerivative();
         virtual float rightDerivative();

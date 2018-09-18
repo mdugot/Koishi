@@ -8,6 +8,10 @@ float Addition::eval() {
     return left->eval() + right->eval();
 }
 
-float Addition::derivate(Variable *from) {
-   return left->derivate(from) + right->derivate(from);
+float Addition::leftDerivative() {
+    return 1;
+}
+
+float Addition::rightDerivative() {
+    return 1;
 }

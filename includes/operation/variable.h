@@ -11,6 +11,9 @@ class Variable : public Number {
         Variable(float value);
         float eval();
         float derivate(Variable *from);
+        virtual void backpropagation(float gradient);
+        inline float getValue() {return value;}
+        inline void setValue(float v) {value = v;}
 
 };
 #endif

@@ -9,6 +9,7 @@ class Addition : public Operation {
     public:
         Addition(Number *left, Number *right);
         float eval();
-        float derivate(Variable *from);
+        virtual float leftDerivative();
+        virtual float rightDerivative();
 };
 #endif

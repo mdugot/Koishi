@@ -6,6 +6,7 @@
 #include <math.h>
 #include <fstream>
 #include <queue>
+#include <vector>
 #include <stack>
 #include <map>
 #include <unordered_map>
@@ -13,6 +14,8 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <exception>
+#include <initializer_list>
 #define NPOS std::string::npos
 #define NL "\n"
 #define PRINT_ERROR true

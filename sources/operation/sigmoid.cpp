@@ -8,7 +8,7 @@ float Sigmoid::eval() {
     return 1 / (1 + exp(-base->eval()));
 }
 
-float Sigmoid::derivate(Variable *from) {
+float Sigmoid::baseDerivative() {
     float sig = eval();
-    return base->derivate(from) * sig * (1-sig);
+    return sig * (1-sig);
 }

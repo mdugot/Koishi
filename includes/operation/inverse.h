@@ -1,14 +1,15 @@
-#ifndef SIGMOID_H
-#define SIGMOID_H
+#ifndef INVERSE_H
+#define INVERSE_H
 #include "operation/transformation.h"
 
-class Sigmoid : public Transformation {
+class Inverse : public Transformation {
 
     protected:
 
     public:
-        Sigmoid(Number *base);
+        Inverse(Number *base);
         float eval();
         virtual float baseDerivative();
 };
 #endif
+

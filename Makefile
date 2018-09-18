@@ -20,7 +20,7 @@ end:
 
 .PHONY: objdir
 objdir:
-	@mkdir $(OBJ_DIR)
+	@mkdir $(OBJ_DIR) 2>/dev/null || echo "" > /dev/null
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) -o $(NAME) -I$(INC_PATH) $(OBJ)

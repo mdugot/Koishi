@@ -14,3 +14,7 @@ float Variable::derivate(Variable *from) {
         return 1;
     return 0;
 }
+
+void Variable::backpropagation(float gradient) {
+    (void)gradient;
+}
