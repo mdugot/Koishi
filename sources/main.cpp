@@ -6,21 +6,32 @@
 #include "operation/pow.h"
 #include "operation/inverse.h"
 #include "tensor/tensor.h"
+#include "tensor/tensorIndexException.h"
+
+void test();
 
 int main(int argc, char **argv) {
 	(void)argc;
 	(void)argv;
+    try {
+        test();
+        return 0;
+    } catch (const std::exception &e) {
+        DEBUG << "ERROR : " << e.what() << NL;
+        return 1;
+    }
+}
+
+void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-	Tensor t1({5,3,4}, 3);
-    DEBUG << t1;
-//	Tensor t2(shape, 2);
-//	
-//	Tensor r1 = Tensor.add(t1, t2);
-//	Tensor r2 = Tensor.add(Tensor.sigmoid(r1), -1);
-//
-//	DEBUG << r2 << NL;
-    
+	Tensor t1({3,2,4}, 3);
+	Tensor t2({3,2,4});
+    Tensor shape = t1.shape();
+    DEBUG << t2 << NL;
+    DEBUG << shape << NL;
+    DEBUG << (shape == t2) << NL;
+
     Variable v1(3);
     Variable v2(-2);
     Multiplication mul(&v1, &v2);
@@ -40,5 +51,4 @@ int main(int argc, char **argv) {
     DEBUG << "gradient 2 : " << v2.getGradient() << NL;
     DEBUG << "checking 1 : " << result.gradientChecking(&v1) << NL;
     DEBUG << "checking 2 : " << result.gradientChecking(&v2) << NL;
-    
 }

@@ -5,6 +5,7 @@
 class TensorIndexException : public std::exception {
 
     private:
+        std::string str;
         std::string message;
         int index;
         int max;
@@ -15,4 +16,3 @@ class TensorIndexException : public std::exception {
     
 };
 #endif
-
