@@ -4,12 +4,13 @@
 #define EPSILON 0.0001
 
 #include "utils.h"
-#include "tensor/tensorInterface.h"
 #include "tensor/tensorIndexException.h"
+#include "tensor/tensorException.h"
 
 class Variable;
+class Tensor;
 
-class Number : public TensorInterface {
+class Number {
 
     protected:
         float gradient;
@@ -24,14 +25,7 @@ class Number : public TensorInterface {
         void calculateGradient(float gradient = 1);
         virtual void backpropagation(float gradient) = 0;
         std::string toString();
-        std::string toString(int margin);
-        virtual TensorInterface& operator [](unsigned int idx);
         inline float getGradient() {return gradient;}
-        inline int len() {return 0;}
-        Tensor shape();
-        inline Number* self() {return this;}
-        virtual bool equals(Tensor &tensor);
-        virtual bool equals(Number &number);
-        virtual bool equals(TensorInterface &tensor);
+        bool equals(Number &number);
 };
 #endif

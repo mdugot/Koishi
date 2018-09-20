@@ -25,12 +25,12 @@ int main(int argc, char **argv) {
 void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-	Tensor t1({3,2,4}, 3);
-	Tensor t2({3,2,4});
-    Tensor shape = t1.shape();
-    DEBUG << t2 << NL;
-    DEBUG << shape << NL;
-    DEBUG << (shape == t2) << NL;
+	Tensor<Tensor<Number>> t1({3,2,4}, 3);
+	Tensor<Number> t2({3,2,4});
+    Tensor<Number> shape = t1.shape();
+    DEBUG << t2.toString() << NL;
+    DEBUG << shape.toString() << NL;
+//    DEBUG << shape.equals(t2) << NL;
 
     Variable v1(3);
     Variable v2(-2);

@@ -1,105 +1,79 @@
 #include "tensor/tensor.h"
 #include "operation/variable.h"
 
-Tensor::Tensor(std::vector<unsigned int> dims, float value) : Tensor()
+Tensor::Tensor(std::vector<unsigned int> dims, std::vector<unsigned int> values) : dims(dims)
 {
-    int len = dims[0];
-    if (dims.size() > 1) {
-        dims.erase(dims.begin());
-        for (int i = 0; i < len; i++) {
-            units.push_back(new Tensor(dims, value));
-        }
-    } else {
-        for (int i = 0; i < len; i++) {
-            units.push_back(new Variable(value));
-        }
+    deletableContent = true;
+    len = calculateLen();
+    this->content = new Number*[total];
+    for (int i = 0; i < total; i++) {
+        content[i] = new Variable(values[i % values.size()]);
     }
 }
 
-Tensor::Tensor(std::vector<float> values) : Tensor()
+Tensor::Tensor(Tensor *origin, unsigned int idx) : dims(origin->dims
 {
-    for (float v : values) {
-        units.push_back(new Variable(v));
+    deletableContent = false;
+    dims.erase(dims.first());
+    len = calculateLen();
+    this->content = new Number*[total];
+    for (int i = len*idx; i < len*(idx+1); i++) {
+        content[i] = origin
     }
 }
 
-Tensor::Tensor()
-{
-    isNumber = false;
+unsigned int Tensor::calculateLen() {
+    unsigned int total = this->dims[0]
+
+    for (int i = 1; i < this->dims.size(); i++) {
+        total *= this->dims[i];
+    }
+    return total;
 }
 
 Tensor::~Tensor() {
-    for (TensorInterface *t : units) {
-        delete t;
+    if (original == true) {
+        for (Number* n : content)
+            delete n;
     }
-}
-
-int Tensor::len() {
-    return units.size();
+    delete content;
 }
 
 Tensor Tensor::shape() {
-    TensorInterface *tmp = this;
-    std::vector<float> values;
-    while (tmp->isNumber == false) {
-        values.push_back((float)tmp->len());
-        tmp = &((*tmp)[0]);
-    }
-    return Tensor(values);
+    return Tensor({dims.size()}, dims);
 }
 
-TensorInterface& Tensor::operator[](unsigned int idx) {
-    if (idx >= units.size())
-        throw TensorIndexException("index out of bound when select tensor element", idx, units.size());
-    return *units[idx];
+Tensor Tensor::operator[](unsigned int idx) {
+    return get(idx);
+}
+
+Tensor Tensor::get(unsigned int idx) {
+    return Tensor(this, idx);
 }
 
 std::string Tensor::toString(int margin) {
-    std::string str = "";
-    for (int i = 0; i<margin; i++)
+    
+    str = 0;
+    for (int i =0; i < margin; i++)
         str += " ";
-    str += "[";
-    bool vector = false;
-    for (unsigned int n = 0; n < units.size(); n++) {
-        if (units[n]->isNumber == false) {
-            str += "\n";
-//            for (int i = 0; i<=margin; i++)
-//                str += " ";
-            str += units[n]->toString(margin+1);
-        } else {
-            vector = true;
-            str += units[n]->toString(0);
+    if (dims.size == 1) {
+        str += "[";
+        for (int i = 0; i < len; i++) {
+            if (i == 0)
+                str += content[i]->toString();
+            else
+                str += ", " + content[i]->toString();
         }
-        if (n < units.size() -1) {
-            str += ", ";
-        }
+        str += "]";
+        return str;
     }
-    if (vector)
-        str += "]";
-    else {
-        str += "\n";
-        for (int i = 0; i<margin; i++)
+
+    for (int i = 0; i < dims[0]; i++) {
+        str += "[\n";
+        str += get(i).toString(margin+1);
+        for (int i =0; i < margin; i++)
             str += " ";
-        str += "]";
+        str += "]\n";
     }
     return str;
-}
-
-bool Tensor::equals(TensorInterface &tensor) {
-    return tensor.equals(*this);
-}
-
-bool Tensor::equals(Tensor &tensor) {
-    if (len() != tensor.len())
-        return false;
-    for (int i = 0; i < len(); i++) {
-        if ((*this)[i] != tensor[i])
-            return false;
-    }
-    return true;
-}
-
-bool Tensor::equals(Number &number) {
-    (void)number;
-    return false;
 }

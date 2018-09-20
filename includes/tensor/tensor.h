@@ -1,28 +1,28 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 #include "utils.h"
-#include "tensor/tensorInterface.h"
 #include "tensor/tensorIndexException.h"
+#include "operation/number.h"
 
-class Tensor : public TensorInterface {
+class Tensor {
 
     private:
-        std::vector<TensorInterface*> units;
+        bool deletableContent;
+        std::vector<unsigned int> dims;
+        unsigned int len;
+        Number** content;
+        
 
     public:
-        Tensor(std::vector<unsigned int> dims, float value);
-        Tensor(std::vector<float> values);
-        Tensor();
+        Tensor(std::vector<unsigned int> dims, std::vector<unsigned int> values = {0});
+        Tensor(Tensor *origin, unsigned int idx);
         ~Tensor();
-        TensorInterface& operator [](unsigned int idx);
-        int len();
+        Tensor operator [](unsigned int idx);
         Tensor shape();
-        std::string toString(int margin = 0);
-        inline Tensor* self() {return this;}
-        virtual bool equals(Tensor &tensor);
-        virtual bool equals(Number &number);
-        virtual bool equals(TensorInterface &tensor);
+        std::string toString();
+//        bool equals(Tensor &tensor);
         
-    
+    friend class Tensor;
 };
+
 #endif
