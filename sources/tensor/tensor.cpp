@@ -4,6 +4,7 @@
 #include "operation/inverse.h"
 #include "operation/sigmoid.h"
 #include "operation/multiplication.h"
+#include "operation/sum.h"
 
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
 {
@@ -70,6 +71,32 @@ Tensor Tensor::operator[](unsigned int idx) {
 
 Tensor Tensor::get(unsigned int idx) const {
     return Tensor(this, idx);
+}
+
+unsigned int Tensor::getAbsoluteIndex(std::vector<unsigned int> idx) const {
+    if (idx.size() != dims.size()) {
+        throw TensorException("Indexs doesn't match tensor dimension");
+    }
+    unsigned int index = idx[0];
+    if (idx[0] >= dims[0])
+        throw TensorException("Index out of bounds");
+    for (unsigned int i = 1; i < dims.size(); i++) {
+        if (idx[i] >= dims[i])
+            throw TensorException("Index out of bounds");
+        index *= dims[i];
+        index += idx[i];
+    }
+    return index;
+}
+
+Number* Tensor::at(std::vector<unsigned int> idx) const {
+    unsigned int index = getAbsoluteIndex(idx);
+    return content[index];
+}
+
+void Tensor::at(std::vector<unsigned int> idx, Number *number) {
+    unsigned int index = getAbsoluteIndex(idx);
+    setContent(index, number);
 }
 
 std::string Tensor::toString(int margin) const {
@@ -179,3 +206,22 @@ Tensor Tensor::sigmoid() {
     }
     return result;
 }
+
+Tensor Tensor::matmul(Tensor &tensor) {
+    if (dims.size() != 2 || tensor.dims.size() != 2)
+        throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix");
+    if (dims[1] != tensor.dims[0])
+        throw TensorException("Matrix multiplication dimensions doesn't match");
+    Tensor result({dims[0], tensor.dims[1]});
+    for (unsigned int i = 0; i < dims[0]; i++) {
+        for (unsigned int j = 0; j < tensor.dims[1]; j++) {
+            std::vector<Number*> row;
+            for (unsigned int k = 0; k < dims[1]; k++) {
+                row.push_back(new Multiplication(at({i, k}), tensor.at({k, j})));
+            }
+            result.at({i,j}, new Sum(row));
+        }
+    }
+    return result;
+}
+

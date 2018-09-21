@@ -4,8 +4,6 @@
 #define EPSILON 0.0001
 
 #include "utils.h"
-#include "tensor/tensorIndexException.h"
-#include "tensor/tensorException.h"
 
 class Variable;
 class Tensor;

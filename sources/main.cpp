@@ -5,8 +5,8 @@
 #include "operation/sigmoid.h"
 #include "operation/pow.h"
 #include "operation/inverse.h"
+#include "operation/sum.h"
 #include "tensor/tensor.h"
-#include "tensor/tensorIndexException.h"
 
 void test();
 
@@ -25,34 +25,18 @@ int main(int argc, char **argv) {
 void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-    Variable v1(3);
-    Variable v2(-2);
-    Variable v3(0.1);
-
-	Tensor t1({3,2}, {1,2,3,4,5,6});
-	Tensor t2({3,2}, {6,-6,0.6,-0.6,0.5,-0.5});
-    DEBUG <<  t1 << NL;
-    DEBUG <<  t2 << NL;
-    DEBUG <<  t2.add(t1) << NL;
-    DEBUG <<  t2.add(t1).inverse() << NL;
-    DEBUG <<  t2.multiply(t1) << NL;
-    DEBUG <<  t2.multiply(v3).sigmoid() << NL;
-
-    Multiplication mul(&v1, &v2);
-    Sigmoid sig(&mul);
-    Pow pow(&v1, &v2);
-    Inverse inv(&mul);
-    Multiplication mul2(&sig, &inv);
-    Addition add(&pow, &mul2);
-
-    Number &result = add;
-    DEBUG << "result : " << result.eval() << NL;
-    DEBUG << "derivate 1 : " << result.derivate(&v1) << NL;
-    DEBUG << "derivate 2 : " << result.derivate(&v2) << NL;
-    result.reinitGradient();
-    result.calculateGradient();
-    DEBUG << "gradient 1 : " << v1.getGradient() << NL;
-    DEBUG << "gradient 2 : " << v2.getGradient() << NL;
-    DEBUG << "checking 1 : " << result.gradientChecking(&v1) << NL;
-    DEBUG << "checking 2 : " << result.gradientChecking(&v2) << NL;
+    Tensor m1({2,3}, {1,2,3,3,2,1});
+    Tensor m2({3,2}, {10,100,-1,-2,2,5});
+    Tensor m3({3,9}, {
+        111,112,113,121,122,123,131,132,133,
+        211,212,213,221,222,223,231,232,233,
+        311,312,313,321,322,323,331,332,333,
+    });
+    Tensor m4({3,1}, {-1,0,1});
+    DEBUG << m1 << NL;
+    DEBUG << m2 << NL;
+    DEBUG << m3 << NL;
+    DEBUG << m1.matmul(m2) << NL;
+    DEBUG << m1.matmul(m3) << NL;
+    DEBUG << m1.matmul(m4) << NL;
 }

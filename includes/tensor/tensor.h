@@ -1,7 +1,7 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 #include "utils.h"
-#include "tensor/tensorIndexException.h"
+#include "tensor/tensorException.h"
 #include "operation/number.h"
 
 class Tensor {
@@ -32,6 +32,10 @@ class Tensor {
         Tensor multiply(Number &number);
         Tensor inverse();
         Tensor sigmoid();
+        unsigned int getAbsoluteIndex(std::vector<unsigned int>idx) const;
+        Number* at(std::vector<unsigned int>idx) const;
+        void at(std::vector<unsigned int>idx, Number* number);
+        Tensor matmul(Tensor &tensor);
 };
 
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
