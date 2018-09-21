@@ -2,10 +2,8 @@
 #include "operation/variable.h"
 #include "tensor/tensor.h"
 
-Number::Number(Tensor *origin) : gradient(0)
+Number::Number() : gradient(0), usedBy(0)
 {
-    if (origin != NULL);
-        origin->push_back(new Wrapper<Number>(*this));
 }
 
 Number::~Number() {

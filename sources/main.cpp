@@ -25,15 +25,19 @@ int main(int argc, char **argv) {
 void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-	Tensor<Tensor<Number>> t1({3,2,4}, 3);
-	Tensor<Number> t2({3,2,4});
-    Tensor<Number> shape = t1.shape();
-    DEBUG << t2.toString() << NL;
-    DEBUG << shape.toString() << NL;
-//    DEBUG << shape.equals(t2) << NL;
-
     Variable v1(3);
     Variable v2(-2);
+    Variable v3(0.1);
+
+	Tensor t1({3,2}, {1,2,3,4,5,6});
+	Tensor t2({3,2}, {6,-6,0.6,-0.6,0.5,-0.5});
+    DEBUG <<  t1 << NL;
+    DEBUG <<  t2 << NL;
+    DEBUG <<  t2.add(t1) << NL;
+    DEBUG <<  t2.add(t1).inverse() << NL;
+    DEBUG <<  t2.multiply(t1) << NL;
+    DEBUG <<  t2.multiply(v3).sigmoid() << NL;
+
     Multiplication mul(&v1, &v2);
     Sigmoid sig(&mul);
     Pow pow(&v1, &v2);

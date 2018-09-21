@@ -7,22 +7,33 @@
 class Tensor {
 
     private:
-        bool deletableContent;
+        Tensor(std::vector<unsigned int> dims);
         std::vector<unsigned int> dims;
         unsigned int len;
         Number** content;
         
 
     public:
-        Tensor(std::vector<unsigned int> dims, std::vector<unsigned int> values = {0});
-        Tensor(Tensor *origin, unsigned int idx);
+        Tensor(std::vector<unsigned int> dims, std::vector<float> values);
+        Tensor(const Tensor *origin, unsigned int idx);
         ~Tensor();
-        Tensor operator [](unsigned int idx);
+        void setContent(unsigned int idx, Number *number);
+        void unsetContent(unsigned int idx);
+        Tensor operator[](unsigned int idx);
+        Tensor get(unsigned int idx) const;
+        unsigned int calculateLen();
         Tensor shape();
-        std::string toString();
-//        bool equals(Tensor &tensor);
-        
-    friend class Tensor;
+        std::string toString(int margin = 0) const;
+        bool equals(Tensor &tensor);
+        bool sameShape(Tensor &tensor);
+        Tensor add(Tensor &tensor);
+        Tensor add(Number &number);
+        Tensor multiply(Tensor &tensor);
+        Tensor multiply(Number &number);
+        Tensor inverse();
+        Tensor sigmoid();
 };
+
+std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
 
 #endif

@@ -16,8 +16,10 @@ class Number {
         float gradient;
 
     public:
+        unsigned int usedBy;
+
         Number();
-        ~Number();
+        virtual ~Number();
         virtual float eval() = 0;
         virtual float derivate(Variable *from) = 0;
         virtual void reinitGradient();
