@@ -1,20 +1,18 @@
 #include "operation/variable.h"
 
-Variable::Variable(float v) : Number()
+std::multimap<std::string, Variable*> Variable::variables;
+
+Variable::Variable(std::string group, std::string name, Initializer &initializer) : Variable(group, name, 0)
 {
-    this->value = v;
+    initializer.add(this);
 }
 
-float Variable::eval() {
-    return value;
+Variable::Variable(std::string group, std::string name, float value) : Constant(value), name(name) {
+    variables.insert(std::pair<std::string, Variable*>(group, this));
 }
 
 float Variable::derivate(Variable *from) {
     if (from == this)
         return 1;
     return 0;
-}
-
-void Variable::backpropagation(float gradient) {
-    (void)gradient;
 }

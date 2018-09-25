@@ -10,6 +10,7 @@ class Operation : public Number {
 
     public:
         Operation(Number *left, Number *right);
+        ~Operation();
         virtual void reinitGradient();
         float derivate(Variable *from);
         virtual void backpropagation(float gradient);

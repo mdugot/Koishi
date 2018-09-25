@@ -2,6 +2,11 @@
 
 Transformation::Transformation(Number *base) : Number(), base(base)
 {
+    base->usedBy += 1;
+}
+
+Transformation::~Transformation() {
+    base->unset();
 }
 
 void Transformation::reinitGradient() {

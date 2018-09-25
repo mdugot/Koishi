@@ -1,13 +1,20 @@
 #include "tensor/tensor.h"
 #include "operation/variable.h"
+#include "operation/constant.h"
 #include "operation/addition.h"
 #include "operation/inverse.h"
 #include "operation/sigmoid.h"
 #include "operation/multiplication.h"
 #include "operation/sum.h"
 
+unsigned int Tensor::count = 0;
+
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
 {
+    count += 1;
+    static unsigned int c = 0;
+    c+=1;
+    name = "tensor" + std::to_string(c);
     len = calculateLen();
     this->content = new Number*[len];
     for (unsigned int i = 0; i < len; i++) {
@@ -18,12 +25,22 @@ Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
 Tensor::Tensor(std::vector<unsigned int> dims, std::vector<float> values) : Tensor(dims)
 {
     for (unsigned int i = 0; i < len; i++) {
-        setContent(i, new Variable(values[i % values.size()]));
+        setContent(i, new Constant(values[i % values.size()]));
+    }
+}
+
+Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer) : Tensor(dims)
+{
+    for (unsigned int i = 0; i < len; i++) {
+        std::string name = this->name + "_" + std::to_string(i);
+        setContent(i, new Variable(group, name, initializer));
     }
 }
 
 Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
 {
+    count += 1;
+    name = origin->name + "[" + std::to_string(idx) + "]";
     dims.erase(dims.begin());
     len = calculateLen();
     this->content = new Number*[len];
@@ -32,15 +49,20 @@ Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
     }
 }
 
+Tensor::~Tensor() {
+    count -= 1;
+    for (unsigned int i = 0; i < len; i++)
+        unsetContent(i);
+    delete content;
+}
+
 void Tensor::setContent(unsigned int idx, Number *number) {
     content[idx] = number;
     number->usedBy += 1;
 }
 
 void Tensor::unsetContent(unsigned int idx) {
-    content[idx]->usedBy -= 1;
-    if (content[idx]->usedBy == 0)
-        delete content[idx];
+    content[idx]->unset();
 }
 
 unsigned int Tensor::calculateLen() {
@@ -52,17 +74,19 @@ unsigned int Tensor::calculateLen() {
     return total;
 }
 
-Tensor::~Tensor() {
-    for (unsigned int i = 0; i < len; i++)
-        unsetContent(i);
-    delete content;
+void Tensor::calculateGradient() {
+    for (unsigned int i = 0; i < len; i++) {
+        content[i]->calculateGradient();
+    }
 }
 
 Tensor Tensor::shape() {
-    return Tensor(
+    Tensor result = Tensor(
         {(unsigned int)dims.size()},
         std::vector<float>(dims.begin(), dims.end())
     );
+    result.name = name + "_shape";
+    return result;
 }
 
 Tensor Tensor::operator[](unsigned int idx) {
@@ -99,18 +123,32 @@ void Tensor::at(std::vector<unsigned int> idx, Number *number) {
     setContent(index, number);
 }
 
-std::string Tensor::toString(int margin) const {
+std::string Tensor::header() const {
+    std::string shapeStr = " (shape="; 
+    for (unsigned int i = 0; i < dims.size(); i++) {
+        if (i > 0)
+            shapeStr += ",";
+        shapeStr += std::to_string(dims[i]);
+    }
+    shapeStr += ")";
+    return name + shapeStr;
+}
+
+std::string Tensor::toString(bool printGradient, int margin) const {
     
     std::string str = "";
+    if (margin == 0) {
+        str += header() + " : " + NL;
+    }
     for (int i =0; i < margin; i++)
         str += " ";
     if (dims.size() == 1) {
         str += "[";
         for (unsigned int i = 0; i < len; i++) {
             if (i == 0)
-                str += content[i]->toString();
+                str += content[i]->toString(printGradient);
             else
-                str += ", " + content[i]->toString();
+                str += ", " + content[i]->toString(printGradient);
         }
         str += "]";
         return str;
@@ -118,7 +156,7 @@ std::string Tensor::toString(int margin) const {
 
     str += "[\n";
     for (unsigned int i = 0; i < dims[0]; i++) {
-        str += get(i).toString(margin+1);
+        str += get(i).toString(printGradient, margin+1);
         str += "\n";
     }
     for (int i =0; i < margin; i++)
@@ -156,58 +194,78 @@ bool Tensor::sameShape(Tensor &tensor) {
 }
 
 Tensor Tensor::add(Number &number) {
+    static unsigned int c = 0;
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Addition(content[i], &number));
     }
+    c+=1;
+    result.name = "scallarAdd" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::add(Tensor &tensor) {
+    static unsigned int c = 0;
     if (sameShape(tensor) == false)
         throw TensorException("can not add tensor of different shapes");
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Addition(content[i], tensor.content[i]));
     }
+    c+=1;
+    result.name = "add" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::multiply(Number &number) {
+    static unsigned int c = 0;
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Multiplication(content[i], &number));
     }
+    c+=1;
+    result.name = "scallarMultiply" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::multiply(Tensor &tensor) {
+    static unsigned int c = 0;
     if (sameShape(tensor) == false)
         throw TensorException("can not add tensor of different shapes");
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Multiplication(content[i], tensor.content[i]));
     }
+    c+=1;
+    result.name = "multiply" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::inverse() {
+    static unsigned int c = 0;
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Inverse(content[i]));
     }
+    c+=1;
+    result.name = "inverse" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::sigmoid() {
+    static unsigned int c = 0;
     Tensor result(dims);
     for (unsigned int i = 0; i < len; i++) {
         result.setContent(i, new Sigmoid(content[i]));
     }
+    c+=1;
+    result.name = "sigmoid" + std::to_string(c);
     return result;
 }
 
 Tensor Tensor::matmul(Tensor &tensor) {
+    static unsigned int c = 0;
+
     if (dims.size() != 2 || tensor.dims.size() != 2)
         throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix");
     if (dims[1] != tensor.dims[0])
@@ -222,6 +280,15 @@ Tensor Tensor::matmul(Tensor &tensor) {
             result.at({i,j}, new Sum(row));
         }
     }
+    c+=1;
+    result.name = "matmul" + std::to_string(c);
     return result;
 }
 
+Sum Tensor::sum() {
+    std::vector<Number*> vector;
+    for (unsigned int i = 0; i < len; i++) {
+        vector.push_back(content[i]);
+    }
+    return Sum(vector);
+}

@@ -2,6 +2,13 @@
 
 Operation::Operation(Number *left, Number *right) : Number(), left(left), right(right)
 {
+    left->usedBy += 1;
+    right->usedBy += 1;
+}
+
+Operation::~Operation() {
+    left->unset();
+    right->unset();
 }
 
 void Operation::reinitGradient() {

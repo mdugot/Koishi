@@ -7,6 +7,7 @@
 #include "operation/inverse.h"
 #include "operation/sum.h"
 #include "tensor/tensor.h"
+#include "initializer/uniform.h"
 
 void test();
 
@@ -25,18 +26,27 @@ int main(int argc, char **argv) {
 void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-    Tensor m1({2,3}, {1,2,3,3,2,1});
-    Tensor m2({3,2}, {10,100,-1,-2,2,5});
-    Tensor m3({3,9}, {
-        111,112,113,121,122,123,131,132,133,
-        211,212,213,221,222,223,231,232,233,
-        311,312,313,321,322,323,331,332,333,
-    });
-    Tensor m4({3,1}, {-1,0,1});
-    DEBUG << m1 << NL;
-    DEBUG << m2 << NL;
-    DEBUG << m3 << NL;
-    DEBUG << m1.matmul(m2) << NL;
-    DEBUG << m1.matmul(m3) << NL;
-    DEBUG << m1.matmul(m4) << NL;
+    Variable *v = new Variable("test", "test", 0.5);
+    Inverse *inv = new Inverse(v);
+    DEBUG << "VALUE : " << inv->toString() << NL;
+    DEBUG << "CHECKING : " << inv->gradientChecking(v) << NL;
+
+//    Uniform init(-1,1);
+//    Tensor m1({2,3}, "v1", init);
+//    Tensor m2({3,2}, "v2", init);
+//    Tensor mm = m1.matmul(m2);
+//    Tensor inv = mm.inverse();
+//    Tensor sig = inv.sigmoid();
+//    Sum sum = inv.sum();
+//
+//    init.init();
+//
+//    DEBUG << "SUM : " << sum.toString() << NL;
+//    sig.calculateGradient();
+//    DEBUG << m1.toString(true) << NL;
+//    DEBUG << m2.toString(true) << NL;
+//
+//    sum.checkAllGradient("v1");
+
+
 }

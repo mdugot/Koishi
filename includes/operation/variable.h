@@ -1,19 +1,20 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
-#include "operation/number.h"
+#include "operation/constant.h"
+#include "initializer/initializer.h"
 
-class Variable : public Number {
+class Variable : public Constant {
     
     private:
-        float value;
+        std::string name;
 
     public:
-        Variable(float value);
-        float eval();
+        static std::multimap<std::string, Variable*> variables;
+
+        Variable(std::string group, std::string name, Initializer &initializer);
+        Variable(std::string group, std::string name, float value);
+        inline std::string getName() {return name;}
         float derivate(Variable *from);
-        virtual void backpropagation(float gradient);
-        inline float getValue() {return value;}
-        inline void setValue(float v) {value = v;}
 
 };
 #endif

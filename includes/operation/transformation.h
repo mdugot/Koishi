@@ -9,6 +9,7 @@ class Transformation : public Number {
 
     public:
         Transformation(Number *base);
+        ~Transformation();
         virtual void reinitGradient();
         float derivate(Variable *from);
         virtual void backpropagation(float gradient);

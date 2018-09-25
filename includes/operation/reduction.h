@@ -9,6 +9,7 @@ class Reduction : public Number {
 
     public:
         Reduction(std::vector<Number*> vector);
+        ~Reduction();
         virtual void reinitGradient();
         float derivate(Variable *from);
         virtual void backpropagation(float gradient);

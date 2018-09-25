@@ -2,6 +2,15 @@
 
 Reduction::Reduction(std::vector<Number*> vector) : vector(vector)
 {
+    for (Number *n : vector) {
+        n->usedBy += 1;
+    }
+}
+
+Reduction::~Reduction() {
+    for (Number *n : vector) {
+        n->unset();
+    }
 }
 
 void Reduction::reinitGradient() {
