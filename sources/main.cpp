@@ -26,27 +26,27 @@ int main(int argc, char **argv) {
 void test() {
 	DEBUG << "testing tensor lib" << NL;
 
-    Variable *v = new Variable("test", "test", 0.5);
-    Inverse *inv = new Inverse(v);
-    DEBUG << "VALUE : " << inv->toString() << NL;
-    DEBUG << "CHECKING : " << inv->gradientChecking(v) << NL;
+//    Variable *v = new Variable("test", "test", 0.5);
+//    Inverse *inv = new Inverse(v);
+//    DEBUG << "VALUE : " << inv->toString() << NL;
+//    DEBUG << "CHECKING : " << inv->gradientChecking(v) << NL;
 
-//    Uniform init(-1,1);
-//    Tensor m1({2,3}, "v1", init);
-//    Tensor m2({3,2}, "v2", init);
-//    Tensor mm = m1.matmul(m2);
-//    Tensor inv = mm.inverse();
-//    Tensor sig = inv.sigmoid();
-//    Sum sum = inv.sum();
-//
-//    init.init();
-//
-//    DEBUG << "SUM : " << sum.toString() << NL;
-//    sig.calculateGradient();
-//    DEBUG << m1.toString(true) << NL;
-//    DEBUG << m2.toString(true) << NL;
-//
-//    sum.checkAllGradient("v1");
+    Uniform init(-1,1);
+    Tensor m1({20,30}, "v1", init);
+    Tensor m2({30,20}, "v2", init);
+    Tensor mm = m1.matmul(m2);
+    Tensor inv = mm.inverse();
+    Tensor sig = inv.sigmoid();
+    Sum sum = sig.sum();
+
+    init.init();
+
+    DEBUG << "SUM : " << sum.toString() << NL;
+    sig.calculateGradient();
+    DEBUG << m1.toString(true) << NL;
+    DEBUG << m2.toString(true) << NL;
+
+    sum.checkAllGradient("v1");
 
 
 }

@@ -5,11 +5,11 @@
 class Uniform : public Initializer {
     
     private:
-        std::uniform_real_distribution<float> distribution;
+        std::uniform_real_distribution<FLOAT> distribution;
 
 
     public:
-        Uniform(float min, float max);
+        Uniform(FLOAT min, FLOAT max);
         virtual ~Uniform();
         void init();
 

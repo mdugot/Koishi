@@ -1,7 +1,7 @@
 #include "initializer/uniform.h"
 #include "operation/variable.h"
 
-Uniform::Uniform(float min, float max) : Initializer(), distribution(min,max)
+Uniform::Uniform(FLOAT min, FLOAT max) : Initializer(), distribution(min,max)
 {
 }
 

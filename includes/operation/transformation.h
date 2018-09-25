@@ -11,8 +11,8 @@ class Transformation : public Number {
         Transformation(Number *base);
         ~Transformation();
         virtual void reinitGradient();
-        float derivate(Variable *from);
-        virtual void backpropagation(float gradient);
-        virtual float baseDerivative() = 0;
+        FLOAT derivate(Variable *from);
+        virtual void backpropagation(FLOAT gradient);
+        virtual FLOAT baseDerivative() = 0;
 };
 #endif

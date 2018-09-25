@@ -17,11 +17,11 @@ void Operation::reinitGradient() {
     right->reinitGradient();
 }
 
-float Operation::derivate(Variable *from) {
+FLOAT Operation::derivate(Variable *from) {
     return leftDerivative()*left->derivate(from) + rightDerivative()*right->derivate(from);
 }
 
-void Operation::backpropagation(float gradient) {
+void Operation::backpropagation(FLOAT gradient) {
     left->calculateGradient(gradient * leftDerivative());
     right->calculateGradient(gradient * rightDerivative());
 }

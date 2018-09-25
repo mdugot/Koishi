@@ -4,14 +4,14 @@ Multiplication::Multiplication(Number *left, Number *right) : Operation(left, ri
 {
 }
 
-float Multiplication::eval() {
+FLOAT Multiplication::eval() {
     return left->eval() * right->eval();
 }
 
-float Multiplication::leftDerivative() {
+FLOAT Multiplication::leftDerivative() {
     return right->eval();
 }
 
-float Multiplication::rightDerivative() {
+FLOAT Multiplication::rightDerivative() {
     return left->eval();
 }

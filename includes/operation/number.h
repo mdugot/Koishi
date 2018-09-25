@@ -1,8 +1,8 @@
 #ifndef NUMBER_H
 #define NUMBER_H
 
-#define EPSILON 0.0000001
-#define CHECKING_THRESHOLD 0.00001
+#define EPSILON 0.00000001
+#define CHECKING_THRESHOLD 0.001
 
 #include "utils.h"
 
@@ -13,7 +13,7 @@ class Tensor;
 class Number {
 
     protected:
-        float gradient;
+        FLOAT gradient;
 
     public:
         static unsigned int count;
@@ -23,15 +23,15 @@ class Number {
         Number();
         virtual ~Number();
         void unset();
-        virtual float eval() = 0;
-        virtual float derivate(Variable *from) = 0;
+        virtual FLOAT eval() = 0;
+        virtual FLOAT derivate(Variable *from) = 0;
         virtual void reinitGradient();
-        float gradientChecking(Variable *from);
+        FLOAT gradientChecking(Variable *from);
         void checkAllGradient(std::string group);
-        void calculateGradient(float gradient = 1);
-        virtual void backpropagation(float gradient) = 0;
+        void calculateGradient(FLOAT gradient = 1);
+        virtual void backpropagation(FLOAT gradient) = 0;
         std::string toString(bool printGradient = false);
-        inline float getGradient() {return gradient;}
+        inline FLOAT getGradient() {return gradient;}
         bool equals(Number &number);
 };
 #endif

@@ -5,15 +5,15 @@
 class Constant : public Number {
     
     private:
-        float value;
+        FLOAT value;
 
     public:
-        Constant(float value);
-        float eval();
-        float derivate(Variable *from);
-        virtual void backpropagation(float gradient);
-        inline float getValue() {return value;}
-        inline void setValue(float v) {value = v;}
+        Constant(FLOAT value);
+        FLOAT eval();
+        FLOAT derivate(Variable *from);
+        virtual void backpropagation(FLOAT gradient);
+        inline FLOAT getValue() {return value;}
+        inline void setValue(FLOAT v) {value = v;}
 
 };
 #endif

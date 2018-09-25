@@ -7,11 +7,11 @@ Variable::Variable(std::string group, std::string name, Initializer &initializer
     initializer.add(this);
 }
 
-Variable::Variable(std::string group, std::string name, float value) : Constant(value), name(name) {
+Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name) {
     variables.insert(std::pair<std::string, Variable*>(group, this));
 }
 
-float Variable::derivate(Variable *from) {
+FLOAT Variable::derivate(Variable *from) {
     if (from == this)
         return 1;
     return 0;

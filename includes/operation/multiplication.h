@@ -8,9 +8,9 @@ class Multiplication : public Operation {
 
     public:
         Multiplication(Number *left, Number *right);
-        float eval();
-        virtual float leftDerivative();
-        virtual float rightDerivative();
+        FLOAT eval();
+        virtual FLOAT leftDerivative();
+        virtual FLOAT rightDerivative();
 };
 #endif
 

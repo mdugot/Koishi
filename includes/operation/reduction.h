@@ -11,9 +11,9 @@ class Reduction : public Number {
         Reduction(std::vector<Number*> vector);
         ~Reduction();
         virtual void reinitGradient();
-        float derivate(Variable *from);
-        virtual void backpropagation(float gradient);
-        virtual float oneDerivative(unsigned int idx) = 0;
+        FLOAT derivate(Variable *from);
+        virtual void backpropagation(FLOAT gradient);
+        virtual FLOAT oneDerivative(unsigned int idx) = 0;
 };
 
 #endif

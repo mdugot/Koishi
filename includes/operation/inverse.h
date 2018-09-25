@@ -8,8 +8,8 @@ class Inverse : public Transformation {
 
     public:
         Inverse(Number *base);
-        float eval();
-        virtual float baseDerivative();
+        FLOAT eval();
+        virtual FLOAT baseDerivative();
 };
 #endif
 

@@ -22,7 +22,7 @@ Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
     }
 }
 
-Tensor::Tensor(std::vector<unsigned int> dims, std::vector<float> values) : Tensor(dims)
+Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tensor(dims)
 {
     for (unsigned int i = 0; i < len; i++) {
         setContent(i, new Constant(values[i % values.size()]));
@@ -83,7 +83,7 @@ void Tensor::calculateGradient() {
 Tensor Tensor::shape() {
     Tensor result = Tensor(
         {(unsigned int)dims.size()},
-        std::vector<float>(dims.begin(), dims.end())
+        std::vector<FLOAT>(dims.begin(), dims.end())
     );
     result.name = name + "_shape";
     return result;

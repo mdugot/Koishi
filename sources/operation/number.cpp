@@ -19,23 +19,19 @@ void Number::unset() {
         delete this;
 }
 
-void Number::calculateGradient(float gradient) {
+void Number::calculateGradient(FLOAT gradient) {
     this->gradient += gradient;
     this->backpropagation(gradient);
 }
 
-float Number::gradientChecking(Variable *from) {
-    float origin = from->getValue();
+FLOAT Number::gradientChecking(Variable *from) {
+    FLOAT origin = from->getValue();
 
-    DEBUG << "origin : " << origin << NL;
     from->setValue(origin-EPSILON);
-    float r1 = eval();
-    DEBUG << "r1 : " << origin << NL;
+    FLOAT r1 = eval();
     from->setValue(origin+EPSILON);
-    float r2 = eval();
-    DEBUG << "r2 : " << origin << NL;
+    FLOAT r2 = eval();
     from->setValue(origin);
-    DEBUG << "gradient : " << ((r2-r1) / (2*EPSILON)) << NL;
     return (r2-r1) / (2*EPSILON);
 }
 
@@ -61,9 +57,9 @@ void Number::checkAllGradient(std::string group) {
     auto bound = Variable::variables.equal_range(group);
     for (auto it = bound.first; it!=bound.second; ++it) {
         Variable *v = it->second;
-        float checking = gradientChecking(v);
-        float gradient = v->gradient;
-        float diff = ABS(checking-gradient);
+        FLOAT checking = gradientChecking(v);
+        FLOAT gradient = v->gradient;
+        FLOAT diff = ABS(checking-gradient);
         bool error = diff > CHECKING_THRESHOLD;
         if (error) {
             DEBUG << RED << "[ERROR] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << NL;

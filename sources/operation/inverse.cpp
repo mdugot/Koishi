@@ -4,12 +4,12 @@ Inverse::Inverse(Number *base) : Transformation(base)
 {
 }
 
-float Inverse::eval() {
+FLOAT Inverse::eval() {
     return 1 / base->eval();
 }
 
-float Inverse::baseDerivative() {
-    float r = base->eval();
+FLOAT Inverse::baseDerivative() {
+    FLOAT r = base->eval();
     return -(1/(r*r));
 }
 

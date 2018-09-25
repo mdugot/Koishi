@@ -14,10 +14,10 @@ void Transformation::reinitGradient() {
     base->reinitGradient();
 }
 
-float Transformation::derivate(Variable *from) {
+FLOAT Transformation::derivate(Variable *from) {
     return base->derivate(from) * baseDerivative();
 }
 
-void Transformation::backpropagation(float gradient) {
+void Transformation::backpropagation(FLOAT gradient) {
     base->calculateGradient(gradient * baseDerivative());
 }

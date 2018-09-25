@@ -20,7 +20,7 @@ class Tensor {
     public:
         static unsigned int count;
 
-        Tensor(std::vector<unsigned int> dims, std::vector<float> values);
+        Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values);
         Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer);
         Tensor(const Tensor *origin, unsigned int idx);
         ~Tensor();

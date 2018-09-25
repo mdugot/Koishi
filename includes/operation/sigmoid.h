@@ -8,7 +8,7 @@ class Sigmoid : public Transformation {
 
     public:
         Sigmoid(Number *base);
-        float eval();
-        virtual float baseDerivative();
+        FLOAT eval();
+        virtual FLOAT baseDerivative();
 };
 #endif

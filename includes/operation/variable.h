@@ -12,9 +12,9 @@ class Variable : public Constant {
         static std::multimap<std::string, Variable*> variables;
 
         Variable(std::string group, std::string name, Initializer &initializer);
-        Variable(std::string group, std::string name, float value);
+        Variable(std::string group, std::string name, FLOAT value);
         inline std::string getName() {return name;}
-        float derivate(Variable *from);
+        FLOAT derivate(Variable *from);
 
 };
 #endif

@@ -4,11 +4,11 @@ Sigmoid::Sigmoid(Number *base) : Transformation(base)
 {
 }
 
-float Sigmoid::eval() {
+FLOAT Sigmoid::eval() {
     return 1 / (1 + exp(-base->eval()));
 }
 
-float Sigmoid::baseDerivative() {
-    float sig = eval();
+FLOAT Sigmoid::baseDerivative() {
+    FLOAT sig = eval();
     return sig * (1-sig);
 }

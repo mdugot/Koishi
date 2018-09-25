@@ -12,10 +12,10 @@ class Operation : public Number {
         Operation(Number *left, Number *right);
         ~Operation();
         virtual void reinitGradient();
-        float derivate(Variable *from);
-        virtual void backpropagation(float gradient);
-        virtual float leftDerivative() = 0;
-        virtual float rightDerivative() = 0;
+        FLOAT derivate(Variable *from);
+        virtual void backpropagation(FLOAT gradient);
+        virtual FLOAT leftDerivative() = 0;
+        virtual FLOAT rightDerivative() = 0;
 };
 
 #endif

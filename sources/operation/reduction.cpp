@@ -20,15 +20,15 @@ void Reduction::reinitGradient() {
     }
 }
 
-float Reduction::derivate(Variable *from) {
-    float d = 0;
+FLOAT Reduction::derivate(Variable *from) {
+    FLOAT d = 0;
     for (unsigned int i = 0; i < vector.size(); i++) {
         d += vector[i]->derivate(from) * oneDerivative(i);
     }
     return d;
 }
 
-void Reduction::backpropagation(float gradient) {
+void Reduction::backpropagation(FLOAT gradient) {
     for (unsigned int i = 0; i < vector.size(); i++) {
         vector[i]->calculateGradient(gradient * oneDerivative(i));
     }

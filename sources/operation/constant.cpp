@@ -1,20 +1,20 @@
 #include "operation/constant.h"
 
-Constant::Constant(float v) : Number()
+Constant::Constant(FLOAT v) : Number()
 {
     this->value = v;
 }
 
-float Constant::eval() {
+FLOAT Constant::eval() {
     return value;
 }
 
-float Constant::derivate(Variable *from) {
+FLOAT Constant::derivate(Variable *from) {
     (void)from;
     return 0;
 }
 
-void Constant::backpropagation(float gradient) {
+void Constant::backpropagation(FLOAT gradient) {
     (void)gradient;
 }
 
