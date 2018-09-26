@@ -30,5 +30,6 @@
 #define STRING std::string
 #define ABS(x) (x) < 0 ? -(x) : (x)
 #define FLOAT double
+#define STRING_TO_FLOAT std::stod
 
 #endif

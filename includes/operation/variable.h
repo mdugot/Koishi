@@ -9,7 +9,11 @@ class Variable : public Constant {
         std::string name;
 
     public:
-        static std::multimap<std::string, Variable*> variables;
+        static std::multimap<std::string, Variable*> variablesByGroup;
+        static std::map<std::string, Variable*> variablesById;
+
+        static void save(std::string filename);
+        static void load(std::string filename);
 
         Variable(std::string group, std::string name, Initializer &initializer);
         Variable(std::string group, std::string name, FLOAT value);

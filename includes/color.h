@@ -20,7 +20,7 @@
 #  define LIGHT_CYAN     	"\033[1;36m"
 #  define LIGHT_GREY     	"\033[1;37m"
 
-#  define BLACK_COLOR 		"\033[0;90m"
+#  define BLACK     		"\033[0;90m"
 #  define RED      			"\033[91m"
 #  define GREEN    			"\033[0;92m"
 #  define YELLOW   			"\033[0;93m"

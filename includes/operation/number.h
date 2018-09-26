@@ -5,6 +5,7 @@
 #define CHECKING_THRESHOLD 0.001
 
 #include "utils.h"
+#include "numberException.h"
 
 class Variable;
 class Tensor;

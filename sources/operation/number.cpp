@@ -54,17 +54,24 @@ bool Number::equals(Number &number) {
 void Number::checkAllGradient(std::string group) {
     reinitGradient();
     calculateGradient();
-    auto bound = Variable::variables.equal_range(group);
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    DEBUG << BLACK << HLIGHT_GREY << "Gradient checking :" << DEFAULT_COLOR << NL;
+    DEBUG << "..." << NL;
+    unsigned int total = 0;
+    unsigned int success = 0;
     for (auto it = bound.first; it!=bound.second; ++it) {
         Variable *v = it->second;
         FLOAT checking = gradientChecking(v);
         FLOAT gradient = v->gradient;
         FLOAT diff = ABS(checking-gradient);
         bool error = diff > CHECKING_THRESHOLD;
+        total++;
         if (error) {
             DEBUG << RED << "[ERROR] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << NL;
         } else {
-            DEBUG << GREEN << "[OK] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << NL;
+            success++;
+            DEBUG << GREEN << "[OK] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << "\r";
         }
     }
+    DEBUG << NL << BLACK  << HLIGHT_GREY<<"Checking result : " << success << "/" << total << DEFAULT_COLOR << NL;
 }
