@@ -1,3 +1,5 @@
+#ifdef PYTHON_WRAPPER
+#include <boost/python.hpp>
 #include "utils.h"
 #include "operation/variable.h"
 #include "operation/addition.h"
@@ -9,21 +11,9 @@
 #include "tensor/tensor.h"
 #include "initializer/uniform.h"
 
-void maintest();
+using namespace boost::python;
 
-int main(int argc, char **argv) {
-	(void)argc;
-	(void)argv;
-    try {
-        maintest();
-        return 0;
-    } catch (const std::exception &e) {
-        DEBUG << "ERROR : " << e.what() << NL;
-        return 1;
-    }
-}
-
-void maintest() {
+void test() {
 	DEBUG << "testing tensor lib" << NL;
 
 //    Variable *v = new Variable("test", "test", 0.5);
@@ -53,3 +43,21 @@ void maintest() {
 
 
 }
+
+char const* greet()
+{
+   return "hello, world";
+}
+
+int ft() {
+    return 42;
+}
+
+BOOST_PYTHON_MODULE(koishi)
+{
+    def("greet", greet);
+    def("ft", ft);
+    def("test", test);
+}
+
+#endif

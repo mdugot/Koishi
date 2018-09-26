@@ -40,8 +40,9 @@ Variable::Variable(std::string group, std::string name, Initializer &initializer
     initializer.add(this);
 }
 
-Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name) {
+Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group) {
     std::string id = group + "/" + name;
+    this->id = id;
 //    DEBUG << "new variable : " << id << NL;
     if (variablesById.count(id) > 0) {
         throw NumberException("variable '" + id + "' already exists");
@@ -49,6 +50,18 @@ Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(
     variablesById.insert(std::pair<std::string, Variable*>(id, this));
     variablesByGroup.insert(std::pair<std::string, Variable*>(group, this));
 }
+
+Variable::~Variable() {
+    variablesById.erase(id);
+    auto bound = variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        if (it->second == this) {
+            variablesByGroup.erase(it);
+            break;
+        }
+    }
+}
+
 
 FLOAT Variable::derivate(Variable *from) {
     if (from == this)

@@ -7,6 +7,8 @@ class Variable : public Constant {
     
     private:
         std::string name;
+        std::string group;
+        std::string id;
 
     public:
         static std::multimap<std::string, Variable*> variablesByGroup;
@@ -17,6 +19,7 @@ class Variable : public Constant {
 
         Variable(std::string group, std::string name, Initializer &initializer);
         Variable(std::string group, std::string name, FLOAT value);
+        ~Variable();
         inline std::string getName() {return name;}
         FLOAT derivate(Variable *from);
 
