@@ -1,63 +1,33 @@
 #ifdef PYTHON_WRAPPER
-#include <boost/python.hpp>
-#include "utils.h"
-#include "operation/variable.h"
-#include "operation/addition.h"
-#include "operation/multiplication.h"
-#include "operation/sigmoid.h"
-#include "operation/pow.h"
-#include "operation/inverse.h"
-#include "operation/sum.h"
 #include "tensor/tensor.h"
-#include "initializer/uniform.h"
-
-using namespace boost::python;
-
-void test() {
-	DEBUG << "testing tensor lib" << NL;
-
-//    Variable *v = new Variable("test", "test", 0.5);
-//    Inverse *inv = new Inverse(v);
-//    DEBUG << "VALUE : " << inv->toString() << NL;
-//    DEBUG << "CHECKING : " << inv->gradientChecking(v) << NL;
-
-    Uniform init(-1,1);
-    Tensor m1({2,3}, "v1", init);
-    Tensor m2({3,2}, "v2", init);
-    Tensor mm = m1.matmul(m2);
-    Tensor inv = mm.inverse();
-    Tensor sig = inv.sigmoid();
-    Sum sum = sig.sum();
-
-    Variable::load("./save.txt");
-//    init.init();
-
-    DEBUG << "SUM : " << sum.toString() << NL;
-    sig.calculateGradient();
-    DEBUG << m1.toString(true) << NL;
-    DEBUG << m2.toString(true) << NL;
-
-    sum.checkAllGradient("v1");
-
-//    Variable::save("./save.txt");
-
-
-}
 
 char const* greet()
 {
    return "hello, world";
 }
 
-int ft() {
-    return 42;
-}
-
 BOOST_PYTHON_MODULE(koishi)
 {
     def("greet", greet);
-    def("ft", ft);
-    def("test", test);
+
+    class_<InitializerWrapper>("Initializer", init<std::string, FLOAT, FLOAT>())
+        .def("init", &InitializerWrapper::init)
+    ;
+
+    class_<Tensor>("Tensor", init<FLOAT>())
+        .def(init<list&, list&>())
+        .def(init<list&, std::string, InitializerWrapper&>())
+        .def(init<std::string, InitializerWrapper&>())
+        .def("__str__", &Tensor::__str__)
+        .def("add", &Tensor::add, return_value_policy<manage_new_object>())
+        .def("multiply", &Tensor::multiply, return_value_policy<manage_new_object>())
+        .def("inverse", &Tensor::inverse, return_value_policy<manage_new_object>())
+        .def("sigmoid", &Tensor::sigmoid, return_value_policy<manage_new_object>())
+        .def("matmul", &Tensor::matmul, return_value_policy<manage_new_object>())
+        .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())
+        .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
+        .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
+    ;
 }
 
 #endif

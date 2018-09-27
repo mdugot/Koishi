@@ -1,3 +1,4 @@
+default: all
 
 ############################################################################
 ##############################    FOR C++    ###############################
@@ -17,7 +18,7 @@ OBJ= $(addprefix $(OBJ_PATH), $(OBJ_NAME))
 OBJ_DIR= $(sort $(dir $(OBJ)))
 
 .PHONY: cpp
-all: objdir $(NAME)
+cpp: objdir $(NAME)
 	@printf "\n\033[2K[ \033[34m$(NAME) successfully created\033[0m ]\n"
 
 .PHONY: objdir

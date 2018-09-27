@@ -1,11 +1,15 @@
 #ifndef TENSOR_H
 #define TENSOR_H
 #include "utils.h"
+#include "wrapper/wrapperTools.h"
 #include "tensor/tensorException.h"
 #include "operation/number.h"
 #include "initializer/initializer.h"
 
 class Sum;
+#ifdef PYTHON_WRAPPER
+class InitializerWrapper;
+#endif
 
 class Tensor {
 
@@ -15,39 +19,52 @@ class Tensor {
         unsigned int len;
         Number** content;
         std::string name;
+        Tensor getTmp(unsigned int idx) const;
         
 
     public:
         static unsigned int count;
 
+        Tensor(FLOAT value);
+        Tensor(Number* value);
         Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values);
+        Tensor(std::string group, Initializer &initializer);
         Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer);
         Tensor(const Tensor *origin, unsigned int idx);
         ~Tensor();
+
         inline void setName(std::string str) {name = str;}
         inline std::string getName() {return name;}
         void setContent(unsigned int idx, Number *number);
         void unsetContent(unsigned int idx);
-        Tensor operator[](unsigned int idx);
-        Tensor get(unsigned int idx) const;
         unsigned int calculateLen();
         void calculateGradient();
-        Tensor shape();
         std::string toString(bool printGradient = false, int margin = 0) const;
         std::string header() const;
         bool equals(Tensor &tensor);
-        bool sameShape(Tensor &tensor);
-        Tensor add(Tensor &tensor);
-        Tensor add(Number &number);
-        Tensor multiply(Tensor &tensor);
-        Tensor multiply(Number &number);
-        Tensor inverse();
-        Tensor sigmoid();
-        Sum sum();
+        bool sameShape(const Tensor &tensor) const;
         unsigned int getAbsoluteIndex(std::vector<unsigned int>idx) const;
         Number* at(std::vector<unsigned int>idx) const;
         void at(std::vector<unsigned int>idx, Number* number);
-        Tensor matmul(Tensor &tensor);
+        Number& asNumber() const;
+
+        Tensor *shape();
+        Tensor *operator[](unsigned int idx) const;
+        Tensor *get(unsigned int idx) const;
+        Tensor *add(const Tensor &tensor) const;
+        Tensor *multiply(const Tensor &tensor) const;
+        Tensor *inverse() const;
+        Tensor *sigmoid() const;
+        Tensor *sum() const;
+        Tensor *matmul(const Tensor &tensor) const;
+
+
+        #ifdef PYTHON_WRAPPER
+        inline std::string __str__() {return toString();}
+        Tensor(boost::python::list &dims, boost::python::list &values);
+        Tensor(std::string group, InitializerWrapper &wrap);
+        Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);
+        #endif
 };
 
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
