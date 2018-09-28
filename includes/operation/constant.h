@@ -4,7 +4,7 @@
 
 class Constant : public Number {
     
-    private:
+    protected:
         FLOAT value;
 
     public:

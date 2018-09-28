@@ -5,6 +5,7 @@
 #include <boost/python.hpp>
 #include "utils.h"
 #include "initializer/initializer.h"
+#include "initializer/feed.h"
 
 using namespace boost::python;
 
@@ -21,9 +22,22 @@ class InitializerWrapper {
 
     public:
         Initializer *initializer;
-        InitializerWrapper(std::string type, FLOAT min, FLOAT max);
+        InitializerWrapper(Initializer* initializer);
+        virtual ~InitializerWrapper();
         void init();
 };
+
+class FeedWrapper : public InitializerWrapper {
+
+    public:
+        Feed *feeder;
+        FeedWrapper(Feed* initializer);
+        virtual ~FeedWrapper();
+        void feed(list &values);
+};
+
+InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max);
+FeedWrapper *getFeedInitializer(list &values);
 
 #endif
 

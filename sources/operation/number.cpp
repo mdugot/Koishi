@@ -15,8 +15,9 @@ Number::~Number() {
 
 void Number::unset() {
     usedBy -= 1;
-    if (usedBy == 0)
+    if (usedBy == 0) {
         delete this;
+    }
 }
 
 void Number::calculateGradient(FLOAT gradient) {
@@ -51,12 +52,19 @@ bool Number::equals(Number &number) {
     return eval() == number.eval();
 }
 
+void Number::reinitAllGradient(std::string group) {
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        Variable *v = it->second;
+        v->gradient = 0;
+    }
+}
+
 void Number::checkAllGradient(std::string group) {
     reinitGradient();
     calculateGradient();
     auto bound = Variable::variablesByGroup.equal_range(group);
-    DEBUG << BLACK << HLIGHT_GREY << "Gradient checking :" << DEFAULT_COLOR << NL;
-    DEBUG << "..." << NL;
+    OUT << BLACK << HLIGHT_GREY << "Gradient checking :" << DEFAULT_COLOR << NL;
     unsigned int total = 0;
     unsigned int success = 0;
     for (auto it = bound.first; it!=bound.second; ++it) {
@@ -67,11 +75,19 @@ void Number::checkAllGradient(std::string group) {
         bool error = diff > CHECKING_THRESHOLD;
         total++;
         if (error) {
-            DEBUG << RED << "[ERROR] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << NL;
+            OUT << RED << "[ERROR] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << NL;
         } else {
             success++;
-            DEBUG << GREEN << "[OK] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << "\r";
+            OUT << GREEN << "[OK] check " + v->getName() + " : " + std::to_string(diff) << DEFAULT_COLOR << "\r";
         }
     }
-    DEBUG << NL << BLACK  << HLIGHT_GREY<<"Checking result : " << success << "/" << total << DEFAULT_COLOR << NL;
+    OUT << BLACK  << HLIGHT_GREY<<"Checking result : " << success << "/" << total << DEFAULT_COLOR << NL;
+}
+
+void Number::gradientDescent(std::string group, FLOAT learningRate) {
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        Variable *v = it->second;
+        v->descentUpdate(learningRate);
+    }
 }

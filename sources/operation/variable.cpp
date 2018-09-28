@@ -68,3 +68,7 @@ FLOAT Variable::derivate(Variable *from) {
         return 1;
     return 0;
 }
+
+void Variable::descentUpdate(FLOAT learningRate) {
+    value -= gradient*learningRate;
+}

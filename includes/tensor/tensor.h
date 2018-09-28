@@ -52,15 +52,21 @@ class Tensor {
         Tensor *operator[](unsigned int idx) const;
         Tensor *get(unsigned int idx) const;
         Tensor *add(const Tensor &tensor) const;
+        Tensor *pow(const Tensor &tensor) const;
         Tensor *multiply(const Tensor &tensor) const;
         Tensor *inverse() const;
         Tensor *sigmoid() const;
         Tensor *sum() const;
         Tensor *matmul(const Tensor &tensor) const;
 
+        void gradientReinit();
+        void gradientUpdate();
+        void gradientChecking(std::string group);
+
 
         #ifdef PYTHON_WRAPPER
         inline std::string __str__() {return toString();}
+        inline void printGradient() {OUT << toString(true) << NL;}
         Tensor(boost::python::list &dims, boost::python::list &values);
         Tensor(std::string group, InitializerWrapper &wrap);
         Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);

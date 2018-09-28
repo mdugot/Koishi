@@ -22,6 +22,7 @@ class Variable : public Constant {
         ~Variable();
         inline std::string getName() {return name;}
         FLOAT derivate(Variable *from);
+        void descentUpdate(FLOAT learningRate);
 
 };
 #endif

@@ -6,18 +6,19 @@
 #include "operation/sigmoid.h"
 #include "operation/multiplication.h"
 #include "operation/sum.h"
+#include "operation/pow.h"
 
 unsigned int Tensor::count = 0;
 
 #ifdef PYTHON_WRAPPER
 #include "wrapper/wrapperTools.h"
-    Tensor::Tensor(boost::python::list& dims, boost::python::list& values)
+    Tensor::Tensor(list& dims, list& values)
     : Tensor(
         listToVector<unsigned int>(dims),
         listToVector<FLOAT>(values)
     ){}
 
-    Tensor::Tensor(boost::python::list& dims, std::string group, InitializerWrapper &wrap)
+    Tensor::Tensor(list& dims, std::string group, InitializerWrapper &wrap)
     : Tensor(
         listToVector<unsigned int>(dims),
         group,
@@ -57,7 +58,7 @@ Tensor::Tensor(FLOAT value) : Tensor(std::vector<unsigned int>(), {value})
 
 Tensor::Tensor(Number *value) : Tensor(std::vector<unsigned int>())
 {
-    content[0] = value;
+    setContent(0, value);
 }
 
 Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer) : Tensor(dims)
@@ -276,6 +277,25 @@ Tensor *Tensor::add(const Tensor &tensor) const {
     return result;
 }
 
+Tensor *Tensor::pow(const Tensor &tensor) const {
+    static unsigned int c = 0;
+    if (sameShape(tensor) == false && tensor.dims.size() > 0)
+        throw TensorException("can not pow tensor of different shapes");
+    c+=1;
+    Tensor *result = new Tensor(dims);
+    if (tensor.dims.size() == 0) {
+        for (unsigned int i = 0; i < len; i++) {
+            result->setContent(i, new Pow(content[i], tensor.content[0]));
+        }
+    } else {
+        for (unsigned int i = 0; i < len; i++) {
+            result->setContent(i, new Pow(content[i], tensor.content[i]));
+        }
+    }
+    result->name = "pow" + std::to_string(c);
+    return result;
+}
+
 Tensor *Tensor::multiply(const Tensor &tensor) const {
     static unsigned int c = 0;
     if (sameShape(tensor) == false && tensor.dims.size() > 0)
@@ -350,4 +370,22 @@ Tensor *Tensor::sum() const {
     Tensor *result = new Tensor(sum);
     result->name = "sum" + std::to_string(c);
     return result;
+}
+
+void Tensor::gradientUpdate() {
+    if (dims.size() > 0)
+        throw TensorException("gradient update can only be done with 0 dimensional tensor");
+    asNumber().calculateGradient();
+}
+
+void Tensor::gradientReinit() {
+    if (dims.size() > 0)
+        throw TensorException("gradient reinit can only be done with 0 dimensional tensor");
+    asNumber().reinitGradient();
+}
+
+void Tensor::gradientChecking(std::string group) {
+    if (dims.size() > 0)
+        throw TensorException("gradient checking can only be done with 0 dimensional tensor");
+    asNumber().checkAllGradient(group);
 }

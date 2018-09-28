@@ -18,6 +18,8 @@ class Number {
 
     public:
         static unsigned int count;
+        static void gradientDescent(std::string group, FLOAT learningRate);
+        static void reinitAllGradient(std::string group);
 
         unsigned int usedBy;
 
