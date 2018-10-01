@@ -134,30 +134,30 @@ Tensor *Tensor::operator[](unsigned int idx) const {
 
 Tensor *Tensor::get(unsigned int idx) const {
     if (dims.size() == 0)
-        throw TensorException("can not access element of 0 dimensional tensor");
+        throw TensorException("can not access element of 0 dimensional tensor", this);
     if (idx >= dims[0])
-        throw TensorException("Index out of bounds");
+        throw TensorException("Index out of bounds", this);
     return new Tensor(this, idx);
 }
 
 Tensor Tensor::getTmp(unsigned int idx) const {
     if (dims.size() == 0)
-        throw TensorException("can not access element of 0 dimensional tensor");
+        throw TensorException("can not access element of 0 dimensional tensor", this);
     if (idx >= dims[0])
-        throw TensorException("Index out of bounds");
+        throw TensorException("Index out of bounds", this);
     return Tensor(this, idx);
 }
 
 unsigned int Tensor::getAbsoluteIndex(std::vector<unsigned int> idx) const {
     if (idx.size() != dims.size()) {
-        throw TensorException("Indexs doesn't match tensor dimension");
+        throw TensorException("Indexs doesn't match tensor dimension", this);
     }
     unsigned int index = idx[0];
     if (idx[0] >= dims[0])
-        throw TensorException("Index out of bounds");
+        throw TensorException("Index out of bounds", this);
     for (unsigned int i = 1; i < dims.size(); i++) {
         if (idx[i] >= dims[i])
-            throw TensorException("Index out of bounds");
+            throw TensorException("Index out of bounds", this);
         index *= dims[i];
         index += idx[i];
     }
@@ -166,20 +166,20 @@ unsigned int Tensor::getAbsoluteIndex(std::vector<unsigned int> idx) const {
 
 Number* Tensor::at(std::vector<unsigned int> idx) const {
     if (dims.size() == 0)
-        throw TensorException("can not access element of 0 dimensional tensor");
+        throw TensorException("can not access element of 0 dimensional tensor", this);
     unsigned int index = getAbsoluteIndex(idx);
     return content[index];
 }
 
 Number& Tensor::asNumber() const {
     if (dims.size() > 0)
-        throw TensorException("only 0 dimensional tensor can be convert to number");
+        throw TensorException("only 0 dimensional tensor can be convert to number", this);
     return *content[0];
 }
 
 void Tensor::at(std::vector<unsigned int> idx, Number *number) {
     if (dims.size() == 0)
-        throw TensorException("can not set element of 0 dimensional tensor");
+        throw TensorException("can not set element of 0 dimensional tensor", this);
     unsigned int index = getAbsoluteIndex(idx);
     setContent(index, number);
 }
@@ -261,7 +261,7 @@ bool Tensor::sameShape(const Tensor &tensor) const {
 Tensor *Tensor::add(const Tensor &tensor) const {
     static unsigned int c = 0;
     if (sameShape(tensor) == false && tensor.dims.size() > 0)
-        throw TensorException("can not add tensor of different shapes");
+        throw TensorException("can not add tensor of different shapes", this, &tensor);
     c+=1;
     Tensor *result = new Tensor(dims);
     if (tensor.dims.size() == 0) {
@@ -280,7 +280,7 @@ Tensor *Tensor::add(const Tensor &tensor) const {
 Tensor *Tensor::pow(const Tensor &tensor) const {
     static unsigned int c = 0;
     if (sameShape(tensor) == false && tensor.dims.size() > 0)
-        throw TensorException("can not pow tensor of different shapes");
+        throw TensorException("can not pow tensor of different shapes", this, &tensor);
     c+=1;
     Tensor *result = new Tensor(dims);
     if (tensor.dims.size() == 0) {
@@ -299,7 +299,7 @@ Tensor *Tensor::pow(const Tensor &tensor) const {
 Tensor *Tensor::multiply(const Tensor &tensor) const {
     static unsigned int c = 0;
     if (sameShape(tensor) == false && tensor.dims.size() > 0)
-        throw TensorException("can not multiply tensor of different shapes");
+        throw TensorException("can not multiply tensor of different shapes", this, &tensor);
     c+=1;
     Tensor *result = new Tensor(dims);
     if (tensor.dims.size() == 0) {
@@ -341,9 +341,9 @@ Tensor *Tensor::matmul(const Tensor &tensor) const {
     static unsigned int c = 0;
 
     if (dims.size() != 2 || tensor.dims.size() != 2)
-        throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix");
+        throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix", this, &tensor);
     if (dims[1] != tensor.dims[0])
-        throw TensorException("Matrix multiplication dimensions doesn't match");
+        throw TensorException("Matrix multiplication dimensions doesn't match", this, &tensor);
     Tensor *result = new Tensor({dims[0], tensor.dims[1]});
     for (unsigned int i = 0; i < dims[0]; i++) {
         for (unsigned int j = 0; j < tensor.dims[1]; j++) {
@@ -374,18 +374,18 @@ Tensor *Tensor::sum() const {
 
 void Tensor::gradientUpdate() {
     if (dims.size() > 0)
-        throw TensorException("gradient update can only be done with 0 dimensional tensor");
+        throw TensorException("gradient update can only be done with 0 dimensional tensor", this);
     asNumber().calculateGradient();
 }
 
 void Tensor::gradientReinit() {
     if (dims.size() > 0)
-        throw TensorException("gradient reinit can only be done with 0 dimensional tensor");
+        throw TensorException("gradient reinit can only be done with 0 dimensional tensor", this);
     asNumber().reinitGradient();
 }
 
 void Tensor::gradientChecking(std::string group) {
     if (dims.size() > 0)
-        throw TensorException("gradient checking can only be done with 0 dimensional tensor");
+        throw TensorException("gradient checking can only be done with 0 dimensional tensor", this);
     asNumber().checkAllGradient(group);
 }

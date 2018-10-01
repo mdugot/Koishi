@@ -31,6 +31,10 @@ InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max) {
     return new InitializerWrapper(new Uniform(min,max));
 }
 
+InitializerWrapper *getFillInitializer(FLOAT value) {
+    return new InitializerWrapper(new Fill(value));
+}
+
 FeedWrapper *getFeedInitializer(list &values) {
     return new FeedWrapper(new Feed(listToVector<FLOAT>(values)));
 }

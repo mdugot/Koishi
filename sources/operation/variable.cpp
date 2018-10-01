@@ -37,10 +37,12 @@ void Variable::load(std::string filename) {
 
 Variable::Variable(std::string group, std::string name, Initializer &initializer) : Variable(group, name, 0)
 {
+    this->initializer = &initializer;
     initializer.add(this);
 }
 
 Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group) {
+    initializer = NULL;
     std::string id = group + "/" + name;
     this->id = id;
 //    DEBUG << "new variable : " << id << NL;
@@ -60,6 +62,8 @@ Variable::~Variable() {
             break;
         }
     }
+    if (initializer)
+        initializer->remove(this);
 }
 
 

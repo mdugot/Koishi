@@ -9,9 +9,11 @@ char const* greet()
 BOOST_PYTHON_MODULE(koishi)
 {
     def("greet", greet);
+    def("initializeAll", &Initializer::initializeAll);
 
     def("uniformInitializer", getUniformInitializer, return_value_policy<manage_new_object>());
     def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
+    def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
     def("gradientDescent", Number::gradientDescent);
     def("gradientReinit", Number::reinitAllGradient);
@@ -39,6 +41,7 @@ BOOST_PYTHON_MODULE(koishi)
         .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
         .def("gradientUpdate", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
+        .def("gradientReinit", &Tensor::gradientReinit)
         .def("show", &Tensor::printGradient)
 
         .add_property("name", &Tensor::getName, &Tensor::setName)

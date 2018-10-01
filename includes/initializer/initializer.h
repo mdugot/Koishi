@@ -8,13 +8,17 @@ class Initializer {
     
     protected:
         std::default_random_engine generator;
-        std::vector<Variable*> variables;
+        std::list<Variable*> variables;
 
     public:
+        static std::list<Initializer*> all;
+        static void initializeAll();
+
         Initializer();
         virtual ~Initializer();
         virtual void init() = 0 ;
         void add(Variable *v);
+        void remove(Variable *v);
 
 };
 #endif

@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "initializer/initializer.h"
 #include "initializer/feed.h"
+#include "initializer/fill.h"
 
 using namespace boost::python;
 
@@ -37,6 +38,7 @@ class FeedWrapper : public InitializerWrapper {
 };
 
 InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max);
+InitializerWrapper *getFillInitializer(FLOAT value);
 FeedWrapper *getFeedInitializer(list &values);
 
 #endif

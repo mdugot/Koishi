@@ -9,6 +9,7 @@ class Variable : public Constant {
         std::string name;
         std::string group;
         std::string id;
+        Initializer *initializer;
 
     public:
         static std::multimap<std::string, Variable*> variablesByGroup;
@@ -23,6 +24,8 @@ class Variable : public Constant {
         inline std::string getName() {return name;}
         FLOAT derivate(Variable *from);
         void descentUpdate(FLOAT learningRate);
+        inline void setInitializer(Initializer* init) {initializer = init;}
+        inline Initializer* getInitializer() {return initializer;}
 
 };
 #endif
