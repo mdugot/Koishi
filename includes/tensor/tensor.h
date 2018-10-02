@@ -59,6 +59,14 @@ class Tensor {
         Tensor *sum() const;
         Tensor *matmul(const Tensor &tensor) const;
 
+        inline Tensor *addRaw(FLOAT rawValue) {return add(Tensor(rawValue));}
+        inline Tensor *powRaw(FLOAT rawValue) {return pow(Tensor(rawValue));}
+        inline Tensor *multiplyRaw(FLOAT rawValue) {return multiply(Tensor(rawValue));}
+        inline Tensor *divide(const Tensor &tensor) {return multiply(*tensor.inverse());}
+        inline Tensor *divideRaw(FLOAT rawValue) {return divide(Tensor(rawValue));}
+        inline Tensor *substract(const Tensor &tensor) {return add(*tensor.multiply(-1));}
+        inline Tensor *substractRaw(FLOAT rawValue) {return substract(Tensor(rawValue));}
+
         void gradientReinit();
         void gradientUpdate();
         void gradientChecking(std::string group);
@@ -70,6 +78,7 @@ class Tensor {
         Tensor(boost::python::list &dims, boost::python::list &values);
         Tensor(std::string group, InitializerWrapper &wrap);
         Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);
+        boost::python::object evalForPython();
         #endif
 };
 

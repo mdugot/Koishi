@@ -3,13 +3,25 @@
 std::multimap<std::string, Variable*> Variable::variablesByGroup;
 std::map<std::string, Variable*> Variable::variablesById;
 
-void Variable::save(std::string filename) {
+void Variable::saveAll(std::string filename) {
     std::ofstream file;
     file.open(filename);
     if (!file.is_open())
         throw NumberException("can not open file '" + filename + "'");
     for (auto it=variablesById.begin(); it != variablesById.end(); ++it) {
         file << it->first + "," + std::to_string(it->second->getValue()) << NL;
+    }
+    file.close();
+}
+
+void Variable::save(std::string filename, std::string group) {
+    std::ofstream file;
+    file.open(filename);
+    if (!file.is_open())
+        throw NumberException("can not open file '" + filename + "'");
+    auto bound = variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        file << it->second->getId() + "," + std::to_string(it->second->getValue()) << NL;
     }
     file.close();
 }

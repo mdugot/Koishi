@@ -35,11 +35,13 @@ class FeedWrapper : public InitializerWrapper {
         FeedWrapper(Feed* initializer);
         virtual ~FeedWrapper();
         void feed(list &values);
+        void feedSimple(FLOAT value);
 };
 
 InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max);
 InitializerWrapper *getFillInitializer(FLOAT value);
 FeedWrapper *getFeedInitializer(list &values);
+FeedWrapper *getSimpleFeedInitializer(FLOAT value);
 
 #endif
 

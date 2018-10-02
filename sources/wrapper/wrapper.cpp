@@ -1,18 +1,44 @@
 #ifdef PYTHON_WRAPPER
 #include "tensor/tensor.h"
+#include "operation/variable.h"
 
 char const* greet()
 {
    return "KOISHI (a math library for machine-learning)";
 }
 
+object  test(bool i) {
+    list result;
+    result.append(1);
+    result.append(2);
+    result.append(3);
+    if (i)
+        return result;
+    return object(42);
+}
+
+list  test2() {
+    list result;
+    result.append(1);
+    result.append(2);
+    result.append(3);
+    return result;
+}
+
+
 BOOST_PYTHON_MODULE(koishi)
 {
     def("greet", greet);
+    def("test", test);
+    def("test2", test2);
     def("initializeAll", &Initializer::initializeAll);
+    def("save", &Variable::save);
+    def("saveAll", &Variable::saveAll);
+    def("load", &Variable::load);
 
     def("uniformInitializer", getUniformInitializer, return_value_policy<manage_new_object>());
     def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
+    def("feedInitializer", getSimpleFeedInitializer, return_value_policy<manage_new_object>());
     def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
     def("gradientDescent", Number::gradientDescent);
@@ -23,6 +49,7 @@ BOOST_PYTHON_MODULE(koishi)
     ;
     class_<FeedWrapper, bases<InitializerWrapper>>("Feed", no_init)
         .def("feed", &FeedWrapper::feed)
+        .def("feed", &FeedWrapper::feedSimple)
     ;
 
     class_<Tensor>("Tensor", init<FLOAT>())
@@ -30,10 +57,18 @@ BOOST_PYTHON_MODULE(koishi)
         .def(init<list&, std::string, InitializerWrapper&>())
         .def(init<std::string, InitializerWrapper&>())
         .def("__str__", &Tensor::__str__)
+        .def("eval", &Tensor::evalForPython)
         .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())
         .def("add", &Tensor::add, return_value_policy<manage_new_object>())
+        .def("add", &Tensor::addRaw, return_value_policy<manage_new_object>())
+        .def("substract", &Tensor::substract, return_value_policy<manage_new_object>())
+        .def("substract", &Tensor::substractRaw, return_value_policy<manage_new_object>())
         .def("pow", &Tensor::pow, return_value_policy<manage_new_object>())
+        .def("pow", &Tensor::powRaw, return_value_policy<manage_new_object>())
         .def("multiply", &Tensor::multiply, return_value_policy<manage_new_object>())
+        .def("multiply", &Tensor::multiplyRaw, return_value_policy<manage_new_object>())
+        .def("divide", &Tensor::divide, return_value_policy<manage_new_object>())
+        .def("divide", &Tensor::divideRaw, return_value_policy<manage_new_object>())
         .def("inverse", &Tensor::inverse, return_value_policy<manage_new_object>())
         .def("sigmoid", &Tensor::sigmoid, return_value_policy<manage_new_object>())
         .def("matmul", &Tensor::matmul, return_value_policy<manage_new_object>())
