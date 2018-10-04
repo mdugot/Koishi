@@ -60,6 +60,7 @@ PYLIBNAME= koishi.so
 PYTHON_HEADER_DIRECTORY= /usr/include/python3.6
 LIBRARY_DIRECTORY= /usr/lib/x86_64-linux-gnu 
 PYTHON_LIBRARY= python3.6m 
+NUMPY_LIBRARY= boost_numpy3
 WRAPPER_LIBRARY= boost_python3-py36 
 PYLIBOBJ_PATH= ./pyobj/
 PYLIBOBJ= $(addprefix $(PYLIBOBJ_PATH), $(OBJ_NAME))
@@ -74,7 +75,7 @@ pyobjdir:
 	@mkdir $(PYLIBOBJ_DIR) 2>/dev/null || echo "" > /dev/null
 
 $(PYLIBNAME): $(PYLIBOBJ)
-	@$(CC) -shared -export-dynamic $(PYLIBOBJ) -L$(LIBRARY_DIRECTORY) -l$(PYTHON_LIBRARY) -l$(WRAPPER_LIBRARY) -o $(PYLIBNAME)
+	@$(CC) -Wl,--no-undefined -shared -export-dynamic $(PYLIBOBJ) -L$(LIBRARY_DIRECTORY) -l$(PYTHON_LIBRARY) -l$(WRAPPER_LIBRARY) -l$(NUMPY_LIBRARY) -o $(PYLIBNAME)
 	@printf "\033[2K[ \033[31mcompiling\033[0m ] $< \r"
 
 pyobj/%.o: sources/%.cpp

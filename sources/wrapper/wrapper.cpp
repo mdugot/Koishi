@@ -7,30 +7,12 @@ char const* greet()
    return "KOISHI (a math library for machine-learning)";
 }
 
-object  test(bool i) {
-    list result;
-    result.append(1);
-    result.append(2);
-    result.append(3);
-    if (i)
-        return result;
-    return object(42);
-}
-
-list  test2() {
-    list result;
-    result.append(1);
-    result.append(2);
-    result.append(3);
-    return result;
-}
-
-
 BOOST_PYTHON_MODULE(koishi)
 {
+    Py_Initialize();
+    np::initialize();
+
     def("greet", greet);
-    def("test", test);
-    def("test2", test2);
     def("initializeAll", &Initializer::initializeAll);
     def("save", &Variable::save);
     def("saveAll", &Variable::saveAll);
@@ -50,10 +32,12 @@ BOOST_PYTHON_MODULE(koishi)
     class_<FeedWrapper, bases<InitializerWrapper>>("Feed", no_init)
         .def("feed", &FeedWrapper::feed)
         .def("feed", &FeedWrapper::feedSimple)
+        .def("feed", &FeedWrapper::feedNumpy)
     ;
 
     class_<Tensor>("Tensor", init<FLOAT>())
         .def(init<list&, list&>())
+        .def(init<np::ndarray&>())
         .def(init<list&, std::string, InitializerWrapper&>())
         .def(init<std::string, InitializerWrapper&>())
         .def("__str__", &Tensor::__str__)

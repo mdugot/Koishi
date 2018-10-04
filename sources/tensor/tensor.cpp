@@ -18,6 +18,12 @@ unsigned int Tensor::count = 0;
         listToVector<FLOAT>(values)
     ){}
 
+    Tensor::Tensor(np::ndarray &a)
+    : Tensor(
+        getNumpyShape(a),
+        numpyToVector(a)
+    ){}
+
     Tensor::Tensor(list& dims, std::string group, InitializerWrapper &wrap)
     : Tensor(
         listToVector<unsigned int>(dims),

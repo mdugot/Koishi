@@ -76,6 +76,7 @@ class Tensor {
         inline std::string __str__() {return toString();}
         inline void printGradient() {OUT << toString(true) << NL;}
         Tensor(boost::python::list &dims, boost::python::list &values);
+        Tensor(boost::python::numpy::ndarray &values);
         Tensor(std::string group, InitializerWrapper &wrap);
         Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);
         boost::python::object evalForPython();
