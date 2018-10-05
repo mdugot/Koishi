@@ -10,9 +10,10 @@ class Feed : public Initializer {
 
     public:
         Feed(std::vector<FLOAT> values);
+        Feed();
         virtual ~Feed();
         void init();
-        void feed(std::vector<FLOAT> values);
+        void feed(std::vector<FLOAT> values, bool doInit = true);
 
 };
 #endif

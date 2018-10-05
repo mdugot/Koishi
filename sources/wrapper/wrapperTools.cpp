@@ -1,6 +1,7 @@
 #ifdef PYTHON_WRAPPER
 #include "wrapper/wrapperTools.h"
 #include "tensor/tensor.h"
+#include "tensor/tensorException.h"
 #include "initializer/uniform.h"
 #include "initializer/feed.h"
 #include "operation/numberException.h"
@@ -45,12 +46,8 @@ InitializerWrapper *getFillInitializer(FLOAT value) {
     return new InitializerWrapper(new Fill(value));
 }
 
-FeedWrapper *getFeedInitializer(list &values) {
-    return new FeedWrapper(new Feed(listToVector<FLOAT>(values)));
-}
-
-FeedWrapper *getSimpleFeedInitializer(FLOAT value) {
-    return new FeedWrapper(new Feed({value}));
+FeedWrapper *getFeedInitializer() {
+    return new FeedWrapper(new Feed());
 }
 
 object Tensor::evalForPython() {

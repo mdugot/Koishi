@@ -56,6 +56,8 @@ Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tens
     for (unsigned int i = 0; i < len; i++) {
         setContent(i, new Constant(values[i % values.size()]));
     }
+    if (len % values.size() != 0)
+        throw TensorException("values of initialization must be a divisor of the len of tensor", this);
 }
 
 Tensor::Tensor(FLOAT value) : Tensor(std::vector<unsigned int>(), {value})

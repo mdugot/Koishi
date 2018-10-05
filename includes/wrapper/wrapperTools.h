@@ -9,6 +9,8 @@
 #include "initializer/feed.h"
 #include "initializer/fill.h"
 
+class TensorException;
+
 using namespace boost::python;
 namespace np = boost::python::numpy;
 
@@ -43,8 +45,7 @@ class FeedWrapper : public InitializerWrapper {
 
 InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max);
 InitializerWrapper *getFillInitializer(FLOAT value);
-FeedWrapper *getFeedInitializer(list &values);
-FeedWrapper *getSimpleFeedInitializer(FLOAT value);
+FeedWrapper *getFeedInitializer();
 std::vector<FLOAT> numpyToVector(np::ndarray &a);
 std::vector<unsigned int> getNumpyShape(np::ndarray &a);
 

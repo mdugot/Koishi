@@ -13,6 +13,8 @@ BOOST_PYTHON_MODULE(koishi)
     np::initialize();
 
     def("greet", greet);
+    
+
     def("initializeAll", &Initializer::initializeAll);
     def("save", &Variable::save);
     def("saveAll", &Variable::saveAll);
@@ -20,7 +22,6 @@ BOOST_PYTHON_MODULE(koishi)
 
     def("uniformInitializer", getUniformInitializer, return_value_policy<manage_new_object>());
     def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
-    def("feedInitializer", getSimpleFeedInitializer, return_value_policy<manage_new_object>());
     def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
     def("gradientDescent", Number::gradientDescent);
