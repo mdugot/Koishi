@@ -61,25 +61,21 @@ object Tensor::evalForPython() {
 }
 
 std::vector<FLOAT> numpyToVector(np::ndarray &a) {
-    DEBUG << "numpy to vector\n";
     list l(a.reshape(make_tuple(-1)));
     std::vector<FLOAT> v;
     for (unsigned int i = 0; i < len(l); ++i) {
         v.push_back(float(extract<float_t>(l[i])));
     }
-    DEBUG << "end\n";
     return v;
 }
 
 std::vector<unsigned int> getNumpyShape(np::ndarray &a) {
-    DEBUG << "get numpy shape\n";
     Py_intptr_t const * shape = a.get_shape();
     int ndim = a.get_nd();
     std::vector<unsigned int> v;
     for (int i = 0; i < ndim; ++i) {
         v.push_back(shape[i]);
     }
-    DEBUG << "end\n";
     return v;
 }
 

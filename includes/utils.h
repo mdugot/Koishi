@@ -17,6 +17,7 @@
 #include <exception>
 #include <random>
 #include <initializer_list>
+#include <algorithm>
 #include "color.h"
 #define NPOS std::string::npos
 #define NL "\n"

@@ -23,7 +23,7 @@ class Tensor {
         
 
     public:
-        static unsigned int count;
+        static unsigned int counter;
 
         Tensor(FLOAT value);
         Tensor(Number* value);
@@ -57,15 +57,21 @@ class Tensor {
         Tensor *inverse() const;
         Tensor *sigmoid() const;
         Tensor *sum() const;
+        Tensor *count() const;
+        Tensor *std() const;
         Tensor *matmul(const Tensor &tensor) const;
+        Tensor *percentile(FLOAT percent) const;
 
-        inline Tensor *addRaw(FLOAT rawValue) {return add(Tensor(rawValue));}
-        inline Tensor *powRaw(FLOAT rawValue) {return pow(Tensor(rawValue));}
-        inline Tensor *multiplyRaw(FLOAT rawValue) {return multiply(Tensor(rawValue));}
-        inline Tensor *divide(const Tensor &tensor) {return multiply(*tensor.inverse());}
-        inline Tensor *divideRaw(FLOAT rawValue) {return divide(Tensor(rawValue));}
-        inline Tensor *substract(const Tensor &tensor) {return add(*tensor.multiply(-1));}
-        inline Tensor *substractRaw(FLOAT rawValue) {return substract(Tensor(rawValue));}
+        inline Tensor *addRaw(FLOAT rawValue) const {return add(Tensor(rawValue));}
+        inline Tensor *powRaw(FLOAT rawValue) const {return pow(Tensor(rawValue));}
+        inline Tensor *multiplyRaw(FLOAT rawValue) const {return multiply(Tensor(rawValue));}
+        inline Tensor *divide(const Tensor &tensor) const {return multiply(*tensor.inverse());}
+        inline Tensor *divideRaw(FLOAT rawValue) const {return divide(Tensor(rawValue));}
+        inline Tensor *substract(const Tensor &tensor) const {return add(*tensor.multiply(-1));}
+        inline Tensor *substractRaw(FLOAT rawValue) const {return substract(Tensor(rawValue));}
+        inline Tensor *max() const {return percentile(100);}
+        inline Tensor *min() const {return percentile(0);}
+        inline Tensor *mean() const {return sum()->divide(*count());}
 
         void gradientReinit();
         void gradientUpdate();

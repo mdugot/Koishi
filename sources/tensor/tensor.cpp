@@ -7,8 +7,10 @@
 #include "operation/multiplication.h"
 #include "operation/sum.h"
 #include "operation/pow.h"
+#include "operation/count.h"
+#include "operation/percentile.h"
 
-unsigned int Tensor::count = 0;
+unsigned int Tensor::counter = 0;
 
 #ifdef PYTHON_WRAPPER
 #include "wrapper/wrapperTools.h"
@@ -40,7 +42,7 @@ unsigned int Tensor::count = 0;
 
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
 {
-    count += 1;
+    counter += 1;
     static unsigned int c = 0;
     c+=1;
     name = "tensor" + std::to_string(c);
@@ -83,7 +85,7 @@ Tensor::Tensor(std::string group, Initializer &initializer) : Tensor({}, group, 
 
 Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
 {
-    count += 1;
+    counter += 1;
     name = origin->name + "[" + std::to_string(idx) + "]";
     dims.erase(dims.begin());
     len = calculateLen();
@@ -94,7 +96,7 @@ Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
 }
 
 Tensor::~Tensor() {
-    count -= 1;
+    counter -= 1;
     for (unsigned int i = 0; i < len; i++)
         unsetContent(i);
     delete content;
@@ -378,6 +380,37 @@ Tensor *Tensor::sum() const {
     Tensor *result = new Tensor(sum);
     result->name = "sum" + std::to_string(c);
     return result;
+}
+
+Tensor *Tensor::count() const {
+    static unsigned int c = 0;
+    std::vector<Number*> vector;
+    for (unsigned int i = 0; i < len; i++) {
+        vector.push_back(content[i]);
+    }
+    Count *count = new Count(vector);
+    c+=1;
+    Tensor *result = new Tensor(count);
+    result->name = "count" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::percentile(FLOAT percent) const {
+    static unsigned int c = 0;
+    std::vector<Number*> vector;
+    for (unsigned int i = 0; i < len; i++) {
+        vector.push_back(content[i]);
+    }
+    Percentile *percentile = new Percentile(vector, percent);
+    c+=1;
+    Tensor *result = new Tensor(percentile);
+    result->name = std::to_string(percent) + "percentile" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::std() const {
+    Tensor *squareDiff = substract(*mean())->powRaw(2);
+    return squareDiff->sum()->divide(*count())->powRaw(0.5);
 }
 
 void Tensor::gradientUpdate() {
