@@ -53,7 +53,7 @@ Variable::Variable(std::string group, std::string name, Initializer &initializer
     initializer.add(this);
 }
 
-Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group) {
+Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group), momentum(0), squaredGradientAverage(0) {
     initializer = NULL;
     std::string id = group + "/" + name;
     this->id = id;
@@ -85,6 +85,22 @@ FLOAT Variable::derivate(Variable *from) {
     return 0;
 }
 
-void Variable::descentUpdate(FLOAT learningRate) {
+void Variable::gradientDescent(FLOAT learningRate) {
     value -= gradient*learningRate;
+}
+
+void Variable::momentumOptim(FLOAT learningRate, FLOAT coef) {
+    momentum = coef*momentum - gradient;
+    value += momentum*learningRate;
+}
+
+void Variable::RMSPropOptim(FLOAT learningRate, FLOAT coef) {
+    squaredGradientAverage = coef*squaredGradientAverage + (1-coef)*(gradient*gradient);
+    value -= learningRate / (sqrt(squaredGradientAverage)+EPSILON) * gradient;
+}
+
+void Variable::adamOptim(FLOAT learningRate, FLOAT coef1, FLOAT coef2) {
+    momentum = coef1*momentum + (1-coef1)*gradient;
+    squaredGradientAverage = coef2*squaredGradientAverage + (1-coef2)*(gradient*gradient);
+    value -= learningRate * (momentum/(1-coef1)) / (sqrt((squaredGradientAverage/(1-coef2)))+EPSILON);
 }

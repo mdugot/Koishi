@@ -84,10 +84,38 @@ void Number::checkAllGradient(std::string group) {
     OUT << BLACK  << HLIGHT_GREY<<"Checking result : " << success << "/" << total << DEFAULT_COLOR << NL;
 }
 
-void Number::gradientDescent(std::string group, FLOAT learningRate) {
+void Number::optimizeByGradientDescent(std::string group, FLOAT learningRate) {
     auto bound = Variable::variablesByGroup.equal_range(group);
     for (auto it = bound.first; it!=bound.second; ++it) {
         Variable *v = it->second;
-        v->descentUpdate(learningRate);
+        v->gradientDescent(learningRate);
+        v->gradient = 0;
+    }
+}
+
+void Number::optimizeByMomentum(std::string group, FLOAT learningRate, FLOAT momentumCoef) {
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        Variable *v = it->second;
+        v->momentumOptim(learningRate, momentumCoef);
+        v->gradient = 0;
+    }
+}
+
+void Number::optimizeByRMSProp(std::string group, FLOAT learningRate, FLOAT RMSCoef) {
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        Variable *v = it->second;
+        v->RMSPropOptim(learningRate, RMSCoef);
+        v->gradient = 0;
+    }
+}
+
+void Number::optimizeByAdam(std::string group, FLOAT learningRate, FLOAT momentumCoef, FLOAT RMSCoef) {
+    auto bound = Variable::variablesByGroup.equal_range(group);
+    for (auto it = bound.first; it!=bound.second; ++it) {
+        Variable *v = it->second;
+        v->adamOptim(learningRate, momentumCoef, RMSCoef);
+        v->gradient = 0;
     }
 }

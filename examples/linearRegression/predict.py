@@ -2,6 +2,7 @@
 
 import lr
 import sys
+
 if len(sys.argv) <= 1:
     print("Enter a value in km to predict.")
     quit()

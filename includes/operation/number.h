@@ -18,8 +18,11 @@ class Number {
 
     public:
         static unsigned int count;
-        static void gradientDescent(std::string group, FLOAT learningRate);
         static void reinitAllGradient(std::string group);
+        static void optimizeByGradientDescent(std::string group, FLOAT learningRate);
+        static void optimizeByMomentum(std::string group, FLOAT learningRate, FLOAT momentumCoef);
+        static void optimizeByRMSProp(std::string group, FLOAT learningRate, FLOAT RMSCoef);
+        static void optimizeByAdam(std::string group, FLOAT learningRate, FLOAT momentumCoef, FLOAT RMSCoef);
 
         unsigned int usedBy;
 

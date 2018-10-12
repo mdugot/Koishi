@@ -10,6 +10,8 @@ class Variable : public Constant {
         std::string group;
         std::string id;
         Initializer *initializer;
+        FLOAT momentum;
+        FLOAT squaredGradientAverage;
 
     public:
         static std::multimap<std::string, Variable*> variablesByGroup;
@@ -25,7 +27,10 @@ class Variable : public Constant {
         inline std::string getName() {return name;}
         inline std::string getId() {return id;}
         FLOAT derivate(Variable *from);
-        void descentUpdate(FLOAT learningRate);
+        void gradientDescent(FLOAT learningRate);
+        void momentumOptim(FLOAT learningRate, FLOAT coef);
+        void RMSPropOptim(FLOAT learningRate, FLOAT coef);
+        void adamOptim(FLOAT learningRate, FLOAT coef1, FLOAT coef2);
         inline void setInitializer(Initializer* init) {initializer = init;}
         inline Initializer* getInitializer() {return initializer;}
 

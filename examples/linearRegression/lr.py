@@ -8,8 +8,8 @@ class lr:
         self.km,self.price = self.readData(filename)
         self.initVariable = koishi.fillInitializer(0)
         self.initSize = koishi.fillInitializer(len(self.km))
-        self.feedInputs = koishi.feedInitializer(self.km)
-        self.feedOutputs = koishi.feedInitializer(self.price)
+        self.feedInputs = koishi.feedInitializer()
+        self.feedOutputs = koishi.feedInitializer()
         
         self.inputs = koishi.Tensor([len(self.km),1], "inputs", self.feedInputs)
         self.outputs = koishi.Tensor([len(self.km),1], "outputs", self.feedOutputs)
@@ -20,7 +20,7 @@ class lr:
         self.cost = self.estimation.substract(self.outputs).pow(2).sum().divide(self.m.multiply(2))
 
     
-        self.feedPrediction = koishi.feedInitializer(0)
+        self.feedPrediction = koishi.feedInitializer()
         self.oneInput = koishi.Tensor("oneInput", self.feedPrediction)
         self.prediction = self.oneInput.multiply(self.theta1[0][0]).add(self.theta0)
 
@@ -50,16 +50,15 @@ class lr:
 
     def predict(self, km):
         self.feedPrediction.feed(self.normalize(km, self.kmMin, self.kmRange))
-        self.feedPrediction.init()
         return self.unnormalize(self.prediction.eval(), self.priceMin, self.priceRange)
 
     def plotResult(self, toPredict = None):
         plt.plot(self.rawKm, self.rawPrice, 'bo')
         kmMin = self.kmMin
         kmMax = max(self.rawKm)
-        if toPredict < kmMin:
+        if toPredict is not None and toPredict < kmMin:
             kmMin = toPredict
-        if toPredict > kmMax:
+        if toPredict is not None and toPredict > kmMax:
             kmMax = toPredict
         a = self.predict(kmMin)
         b = self.predict(kmMax)
@@ -70,11 +69,21 @@ class lr:
         plt.show()
         
     
-    def train(self, epoch, learningRate):
+    def train(self, epoch, learningRate, optim = None):
+        self.feedInputs.feed(self.km)
+        self.feedOutputs.feed(self.price)
+        if optim != None:
+            print("Train with : " + optim)
         for i in tqdm(range(epoch)):
-            self.cost.gradientReinit()
             self.cost.gradientUpdate()
-            koishi.gradientDescent("variable", learningRate)
+            if optim == "momentum":
+                koishi.momentumOptim("variable", learningRate, 0.9)
+            elif optim == "rmsprop":
+                koishi.RMSPropOptim("variable", learningRate, 0.9)
+            elif optim == "adam":
+                koishi.adamOptim("variable", learningRate, 0.9, 0.9)
+            else:
+                koishi.gradientDescentOptim("variable", learningRate)
 
     def save(self, filename):
         koishi.save(filename, "variable")

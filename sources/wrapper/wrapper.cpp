@@ -24,7 +24,10 @@ BOOST_PYTHON_MODULE(koishi)
     def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
     def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
-    def("gradientDescent", Number::gradientDescent);
+    def("gradientDescentOptim", Number::optimizeByGradientDescent);
+    def("momentumOptim", Number::optimizeByMomentum);
+    def("RMSPropOptim", Number::optimizeByRMSProp);
+    def("adamOptim", Number::optimizeByAdam);
     def("gradientReinit", Number::reinitAllGradient);
 
     class_<InitializerWrapper>("Initializer", no_init)
