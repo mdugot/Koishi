@@ -21,7 +21,7 @@ class Variable : public Constant {
         static void saveAll(std::string filename);
         static void load(std::string filename);
 
-        Variable(std::string group, std::string name, Initializer &initializer);
+        Variable(std::string group, std::string name, Initializer *initializer);
         Variable(std::string group, std::string name, FLOAT value);
         ~Variable();
         inline std::string getName() {return name;}

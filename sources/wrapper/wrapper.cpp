@@ -30,6 +30,14 @@ BOOST_PYTHON_MODULE(koishi)
     def("adamOptim", Number::optimizeByAdam);
     def("gradientReinit", Number::reinitAllGradient);
 
+    def("Variable", newVariable, return_value_policy<manage_new_object>());
+    def("Variable", newVariableNumber, return_value_policy<manage_new_object>());
+    def("Variable", newVariableNumpy, return_value_policy<manage_new_object>());
+
+    def("Variable", newVariableWithGroup, return_value_policy<manage_new_object>());
+    def("Variable", newVariableNumberWithGroup, return_value_policy<manage_new_object>());
+    def("Variable", newVariableNumpyWithGroup, return_value_policy<manage_new_object>());
+
     class_<InitializerWrapper>("Initializer", no_init)
         .def("init", &InitializerWrapper::init)
     ;
@@ -40,10 +48,8 @@ BOOST_PYTHON_MODULE(koishi)
     ;
 
     class_<Tensor>("Tensor", init<FLOAT>())
-        .def(init<list&, list&>())
+        //.def(init<list&, list&>())
         .def(init<np::ndarray&>())
-        .def(init<list&, std::string, InitializerWrapper&>())
-        .def(init<std::string, InitializerWrapper&>())
         .def("__str__", &Tensor::__str__)
         .def("eval", &Tensor::evalForPython)
         .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())
@@ -68,7 +74,7 @@ BOOST_PYTHON_MODULE(koishi)
         .def("matmul", &Tensor::matmul, return_value_policy<manage_new_object>())
         .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
         .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
-        .def("gradientUpdate", &Tensor::gradientUpdate)
+        .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
         .def("gradientReinit", &Tensor::gradientReinit)
         .def("show", &Tensor::printGradient)

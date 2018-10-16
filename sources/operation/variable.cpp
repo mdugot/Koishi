@@ -47,10 +47,11 @@ void Variable::load(std::string filename) {
     file.close();
 }
 
-Variable::Variable(std::string group, std::string name, Initializer &initializer) : Variable(group, name, 0)
+Variable::Variable(std::string group, std::string name, Initializer *initializer) : Variable(group, name, (FLOAT)0)
 {
-    this->initializer = &initializer;
-    initializer.add(this);
+    this->initializer = initializer;
+    if (initializer)
+        initializer->add(this);
 }
 
 Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group), momentum(0), squaredGradientAverage(0) {

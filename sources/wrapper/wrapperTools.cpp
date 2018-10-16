@@ -79,5 +79,29 @@ std::vector<unsigned int> getNumpyShape(np::ndarray &a) {
     return v;
 }
 
+Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap) {
+    return new Tensor(dims, group, wrap);
+}
+
+Tensor *newVariable(list &dims, InitializerWrapper &wrap) {
+    return new Tensor(dims, "", wrap);
+}
+
+Tensor *newVariableNumberWithGroup(std::string group, FLOAT value) {
+    return new Tensor(group, value);
+}
+
+Tensor *newVariableNumber(FLOAT value) {
+    return new Tensor("", value);
+}
+
+Tensor *newVariableNumpyWithGroup(std::string group, np::ndarray &a) {
+    return new Tensor(group, a);
+}
+
+Tensor *newVariableNumpy(np::ndarray &a) {
+    return new Tensor("", a);
+}
+
 
 #endif

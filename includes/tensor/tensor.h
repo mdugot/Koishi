@@ -28,8 +28,8 @@ class Tensor {
         Tensor(FLOAT value);
         Tensor(Number* value);
         Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values);
-        Tensor(std::string group, Initializer &initializer);
-        Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer);
+        Tensor(std::string group, Initializer *initializer);
+        Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer);
         Tensor(const Tensor *origin, unsigned int idx);
         ~Tensor();
 
@@ -81,10 +81,11 @@ class Tensor {
         #ifdef PYTHON_WRAPPER
         inline std::string __str__() {return toString();}
         inline void printGradient() {OUT << toString(true) << NL;}
-        Tensor(boost::python::list &dims, boost::python::list &values);
         Tensor(boost::python::numpy::ndarray &values);
         Tensor(std::string group, InitializerWrapper &wrap);
         Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);
+        Tensor(std::string group, FLOAT value);
+        Tensor(std::string group, boost::python::numpy::ndarray &a);
         boost::python::object evalForPython();
         #endif
 };

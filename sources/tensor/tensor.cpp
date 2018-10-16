@@ -14,11 +14,6 @@ unsigned int Tensor::counter = 0;
 
 #ifdef PYTHON_WRAPPER
 #include "wrapper/wrapperTools.h"
-    Tensor::Tensor(list& dims, list& values)
-    : Tensor(
-        listToVector<unsigned int>(dims),
-        listToVector<FLOAT>(values)
-    ){}
 
     Tensor::Tensor(np::ndarray &a)
     : Tensor(
@@ -26,17 +21,39 @@ unsigned int Tensor::counter = 0;
         numpyToVector(a)
     ){}
 
+    Tensor::Tensor(std::string group, np::ndarray &a)
+    : Tensor(
+        getNumpyShape(a),
+        group,
+        NULL
+    ){
+        std::vector<FLOAT> values = numpyToVector(a);
+        for (unsigned int i = 0; i < len; i++) {
+            ((Constant*)content[i])->setValue(values[i]);
+        }
+        if (len % values.size() != 0)
+            throw TensorException("values of initialization must be a divisor of the len of tensor", this);
+    }
+
+    Tensor::Tensor(std::string group, FLOAT value)
+    : Tensor(
+        group,
+        (Initializer*)NULL
+    ){
+        ((Constant*)content[0])->setValue(value);
+    }
+
     Tensor::Tensor(list& dims, std::string group, InitializerWrapper &wrap)
     : Tensor(
         listToVector<unsigned int>(dims),
         group,
-        *wrap.initializer
+        wrap.initializer
     ){}
 
     Tensor::Tensor(std::string group, InitializerWrapper &wrap)
     : Tensor(
         group,
-        *wrap.initializer
+        wrap.initializer
     ){}
 #endif
 
@@ -71,7 +88,7 @@ Tensor::Tensor(Number *value) : Tensor(std::vector<unsigned int>())
     setContent(0, value);
 }
 
-Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer &initializer) : Tensor(dims)
+Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer) : Tensor(dims)
 {
     for (unsigned int i = 0; i < len; i++) {
         std::string name = this->name + "_" + std::to_string(i);
@@ -79,7 +96,7 @@ Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer &i
     }
 }
 
-Tensor::Tensor(std::string group, Initializer &initializer) : Tensor({}, group, initializer)
+Tensor::Tensor(std::string group, Initializer *initializer) : Tensor({}, group, initializer)
 {
 }
 
