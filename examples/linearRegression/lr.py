@@ -7,21 +7,20 @@ class lr:
     def __init__(self, filename):
         self.km,self.price = self.readData(filename)
         self.initVariable = koishi.fillInitializer(0)
-        self.initSize = koishi.fillInitializer(len(self.km))
         self.feedInputs = koishi.feedInitializer()
         self.feedOutputs = koishi.feedInitializer()
         
-        self.inputs = koishi.Tensor([len(self.km),1], "inputs", self.feedInputs)
-        self.outputs = koishi.Tensor([len(self.km),1], "outputs", self.feedOutputs)
-        self.theta0 = koishi.Tensor("variable", self.initVariable)
-        self.theta1 = koishi.Tensor([1,1], "variable", self.initVariable)
-        self.m = koishi.Tensor("size", self.initSize)
+        self.inputs = koishi.Variable([len(self.km),1], "inputs", self.feedInputs)
+        self.outputs = koishi.Variable([len(self.km),1], "outputs", self.feedOutputs)
+        self.theta0 = koishi.Variable("variable", self.initVariable)
+        self.theta1 = koishi.Variable([1,1], "variable", self.initVariable)
+        self.m = koishi.Tensor(len(self.km))
         self.estimation = self.inputs.matmul(self.theta1).add(self.theta0)
         self.cost = self.estimation.substract(self.outputs).pow(2).sum().divide(self.m.multiply(2))
 
     
         self.feedPrediction = koishi.feedInitializer()
-        self.oneInput = koishi.Tensor("oneInput", self.feedPrediction)
+        self.oneInput = koishi.Variable("oneInput", self.feedPrediction)
         self.prediction = self.oneInput.multiply(self.theta1[0][0]).add(self.theta0)
 
         koishi.initializeAll()
@@ -75,7 +74,7 @@ class lr:
         if optim != None:
             print("Train with : " + optim)
         for i in tqdm(range(epoch)):
-            self.cost.gradientUpdate()
+            self.cost.backpropagation()
             if optim == "momentum":
                 koishi.momentumOptim("variable", learningRate, 0.9)
             elif optim == "rmsprop":

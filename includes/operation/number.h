@@ -24,6 +24,12 @@ class Number {
         static void optimizeByRMSProp(std::string group, FLOAT learningRate, FLOAT RMSCoef);
         static void optimizeByAdam(std::string group, FLOAT learningRate, FLOAT momentumCoef, FLOAT RMSCoef);
 
+        inline static void reinitAllGradientAll() {reinitAllGradient("");}
+        inline static void optimizeByGradientDescentAll(FLOAT learningRate) {optimizeByGradientDescent("", learningRate);}
+        inline static void optimizeByMomentumAll(FLOAT learningRate, FLOAT momentumCoef) {optimizeByMomentum("", learningRate, momentumCoef);}
+        inline static void optimizeByRMSPropAll(FLOAT learningRate, FLOAT RMSCoef) {optimizeByRMSProp("", learningRate, RMSCoef);}
+        inline static void optimizeByAdamAll(FLOAT learningRate, FLOAT momentumCoef, FLOAT RMSCoef) {optimizeByAdam("", learningRate, momentumCoef, RMSCoef);}
+
         unsigned int usedBy;
 
         Number();
