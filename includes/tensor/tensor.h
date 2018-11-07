@@ -4,6 +4,7 @@
 #include "wrapper/wrapperTools.h"
 #include "tensor/tensorException.h"
 #include "operation/number.h"
+#include "operation/constant.h"
 #include "initializer/initializer.h"
 
 class Sum;
@@ -56,6 +57,7 @@ class Tensor {
         Tensor *multiply(const Tensor &tensor) const;
         Tensor *inverse() const;
         Tensor *sigmoid() const;
+        Tensor *gaussianLikehood(const Tensor &mean, const Tensor &std) const;
         Tensor *sum() const;
         Tensor *count() const;
         Tensor *std() const;

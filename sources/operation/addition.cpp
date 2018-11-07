@@ -1,4 +1,9 @@
 #include "operation/addition.h"
+#include "operation/multiplication.h"
+
+Substraction::Substraction(Number *left, Number *right) : Addition(left, new Negative(right))
+{
+}
 
 Addition::Addition(Number *left, Number *right) : Operation(left, right)
 {

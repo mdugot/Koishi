@@ -120,6 +120,8 @@ Tensor::~Tensor() {
 }
 
 void Tensor::setContent(unsigned int idx, Number *number) {
+    if (content[idx])
+        unsetContent(idx);
     content[idx] = number;
     number->usedBy += 1;
 }
@@ -200,7 +202,7 @@ Number* Tensor::at(std::vector<unsigned int> idx) const {
 
 Number& Tensor::asNumber() const {
     if (dims.size() > 0)
-        throw TensorException("only 0 dimensional tensor can be convert to number", this);
+        throw TensorException("only scallar can be convert to number", this);
     return *content[0];
 }
 
@@ -364,6 +366,43 @@ Tensor *Tensor::sigmoid() const {
     return result;
 }
 
+Tensor *Tensor::gaussianLikehood(const Tensor &mean, const Tensor &std) const {
+    static unsigned int c = 0;
+
+    if (mean.dims.size() > 0)
+        throw TensorException("gaussian likehood mean must be a scallar", this, &mean);
+    if (std.dims.size() > 0)
+        throw TensorException("gaussian likehood standard deviation must be a scallar", this, &std);
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        Number *factor = new Inverse(new Multiplication(
+            &std.asNumber(),
+            new Pow(
+                new Constant(2*M_PI),
+                new Constant(0.5)
+            )
+        ));
+        Number *power = new Multiplication(
+            new Constant(-0.5),
+            new Pow(
+                new Division(
+                    new Substraction(content[i], &mean.asNumber()),
+                    &std.asNumber()
+                ),
+                new Constant(2)
+            )
+        );
+        (void)factor;
+        (void)power;
+        Number *gauss = new Multiplication(factor, new Pow(new Constant(M_E), power));
+        //Number *gauss = power;
+        result->setContent(i, gauss);
+    }
+    c+=1;
+    result->name = "gaussian" + std::to_string(c);
+    return result;
+}
+
 Tensor *Tensor::matmul(const Tensor &tensor) const {
     static unsigned int c = 0;
 
@@ -432,18 +471,18 @@ Tensor *Tensor::std() const {
 
 void Tensor::gradientUpdate() {
     if (dims.size() > 0)
-        throw TensorException("gradient update can only be done with 0 dimensional tensor", this);
+        throw TensorException("gradient update can only be done with a scalar", this);
     asNumber().calculateGradient();
 }
 
 void Tensor::gradientReinit() {
     if (dims.size() > 0)
-        throw TensorException("gradient reinit can only be done with 0 dimensional tensor", this);
+        throw TensorException("gradient reinit can only be done with a scallar", this);
     asNumber().reinitGradient();
 }
 
 void Tensor::gradientChecking(std::string group) {
     if (dims.size() > 0)
-        throw TensorException("gradient checking can only be done with 0 dimensional tensor", this);
+        throw TensorException("gradient checking can only be done with a scallar", this);
     asNumber().checkAllGradient(group);
 }

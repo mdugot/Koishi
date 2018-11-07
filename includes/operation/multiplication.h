@@ -12,5 +12,22 @@ class Multiplication : public Operation {
         virtual FLOAT leftDerivative();
         virtual FLOAT rightDerivative();
 };
+
+class Division : public Multiplication {
+
+    protected:
+
+    public:
+        Division(Number *left, Number *right);
+};
+
+class Negative : public Multiplication {
+
+    protected:
+
+    public:
+        Negative(Number *number);
+};
+
 #endif
 

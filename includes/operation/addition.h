@@ -12,4 +12,13 @@ class Addition : public Operation {
         virtual FLOAT leftDerivative();
         virtual FLOAT rightDerivative();
 };
+
+class Substraction : public Addition {
+
+    protected:
+
+    public:
+        Substraction(Number *left, Number *right);
+};
+
 #endif
