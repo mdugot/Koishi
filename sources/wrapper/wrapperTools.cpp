@@ -87,6 +87,14 @@ Tensor *newVariable(list &dims, InitializerWrapper &wrap) {
     return new Tensor(dims, "", wrap);
 }
 
+Tensor *newSimpleVariable(InitializerWrapper &wrap) {
+    return new Tensor("", wrap);
+}
+
+Tensor *newSimpleVariableWithGroup(std::string group, InitializerWrapper &wrap) {
+    return new Tensor(group, wrap);
+}
+
 Tensor *newVariableNumberWithGroup(std::string group, FLOAT value) {
     return new Tensor(group, value);
 }

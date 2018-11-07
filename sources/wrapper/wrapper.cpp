@@ -30,11 +30,19 @@ BOOST_PYTHON_MODULE(koishi)
     def("adamOptim", Number::optimizeByAdam);
     def("gradientReinit", Number::reinitAllGradient);
 
+    def("gradientDescentOptim", Number::optimizeByGradientDescentAll);
+    def("momentumOptim", Number::optimizeByMomentumAll);
+    def("RMSPropOptim", Number::optimizeByRMSPropAll);
+    def("adamOptim", Number::optimizeByAdamAll);
+    def("gradientReinit", Number::reinitAllGradientAll);
+
     def("Variable", newVariable, return_value_policy<manage_new_object>());
+    def("Variable", newSimpleVariable, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumber, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpy, return_value_policy<manage_new_object>());
 
     def("Variable", newVariableWithGroup, return_value_policy<manage_new_object>());
+    def("Variable", newSimpleVariableWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumberWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpyWithGroup, return_value_policy<manage_new_object>());
 
