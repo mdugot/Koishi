@@ -70,6 +70,19 @@ Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
     }
 }
 
+Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
+{
+    counter += 1;
+    name = origin->name + "[" + std::to_string(idx) + "]";
+    dims.erase(dims.begin());
+    len = calculateLen();
+    this->content = new Number*[len];
+    for (unsigned int i = 0; i < len; i++) {
+        content[i] = NULL;
+        setContent(i, origin->content[len*idx + i]);
+    }
+}
+
 Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tensor(dims)
 {
     for (unsigned int i = 0; i < len; i++) {
@@ -100,18 +113,6 @@ Tensor::Tensor(std::string group, Initializer *initializer) : Tensor({}, group, 
 {
 }
 
-Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
-{
-    counter += 1;
-    name = origin->name + "[" + std::to_string(idx) + "]";
-    dims.erase(dims.begin());
-    len = calculateLen();
-    this->content = new Number*[len];
-    for (unsigned int i = 0; i < len; i++) {
-        setContent(i, origin->content[len*idx + i]);
-    }
-}
-
 Tensor::~Tensor() {
     counter -= 1;
     for (unsigned int i = 0; i < len; i++)
@@ -120,8 +121,9 @@ Tensor::~Tensor() {
 }
 
 void Tensor::setContent(unsigned int idx, Number *number) {
-    if (content[idx])
+    if (content[idx]) {
         unsetContent(idx);
+	}
     content[idx] = number;
     number->usedBy += 1;
 }
@@ -422,6 +424,33 @@ Tensor *Tensor::matmul(const Tensor &tensor) const {
     }
     c+=1;
     result->name = "matmul" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::minor(unsigned int X, unsigned int Y) const {
+    static unsigned int c = 0;
+
+    if (dims.size() != 2)
+        throw TensorException("Matrix minor can only be done with 2 dimensional matrix", this);
+    if (X >= dims[1] || Y >= dims[0])
+        throw TensorException("Matrix minor indexs out limit", this);
+    Tensor *result = new Tensor({dims[0]-1, dims[1]-1});
+	unsigned x = 0;
+	unsigned y = 0;
+    for (unsigned int i = 0; i < dims[1]; i++) {
+		if (i != X) {
+			y = 0;
+        	for (unsigned int j = 0; j < dims[0]; j++) {
+				if (j != Y) {
+	    	        result->at({y,x}, at({j,i}));
+					y++;
+				}
+        	}
+			x++;
+		}
+    }
+    c+=1;
+    result->name = "minor_" + std::to_string(c);
     return result;
 }
 

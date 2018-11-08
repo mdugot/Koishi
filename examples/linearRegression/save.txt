@@ -1,0 +1,2 @@
+variable/tensor3_0,0.936212
+variable/tensor4_0,-0.995376
