@@ -63,6 +63,10 @@ class Tensor {
         Tensor *std() const;
         Tensor *matmul(const Tensor &tensor) const;
 		Tensor *minor(unsigned int X, unsigned int Y) const;
+		Tensor *determinant() const;
+		Tensor *minorMatrix() const;
+		Tensor *matinv() const;
+		Tensor *transpose(std::vector<unsigned int>permutations) const;
         Tensor *percentile(FLOAT percent) const;
 
         inline Tensor *addRaw(FLOAT rawValue) const {return add(Tensor(rawValue));}
@@ -90,6 +94,7 @@ class Tensor {
         Tensor(std::string group, FLOAT value);
         Tensor(std::string group, boost::python::numpy::ndarray &a);
         boost::python::object evalForPython();
+		Tensor *transposeFromList(list& permutations);
         #endif
 };
 

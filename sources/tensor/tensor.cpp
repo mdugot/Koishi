@@ -55,6 +55,10 @@ unsigned int Tensor::counter = 0;
         group,
         wrap.initializer
     ){}
+
+	Tensor *Tensor::transposeFromList(list& permutations) {
+		return transpose(listToVector<unsigned int>(permutations));
+	}
 #endif
 
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
@@ -451,6 +455,109 @@ Tensor *Tensor::minor(unsigned int X, unsigned int Y) const {
     }
     c+=1;
     result->name = "minor_" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::minorMatrix() const {
+    if (dims.size() != 2)
+        throw TensorException("minor matrix can only be build from 2 dimensional matrix", this);
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < dims[1]; i++) {
+        for (unsigned int j = 0; j < dims[0]; j++) {
+			Number *n = &minor(i, j)->determinant()->asNumber();
+			result->at({j,i}, n);
+		}
+	}
+	return result;
+}
+
+Tensor *Tensor::matinv() const {
+    if (dims.size() != 2)
+        throw TensorException("Matrix inverse can only be build from 2 dimensional matrix", this);
+    if (dims[0] != dims[1])
+        throw TensorException("Matrix inverse can only be done with square matrix", this);
+	Tensor *idet = determinant()->inverse();
+    Tensor *mask = new Tensor(dims);
+    Tensor *result = minorMatrix();
+    for (unsigned int i = 0; i < dims[1]; i++) {
+        for (unsigned int j = 0; j < dims[0]; j++) {
+			if ((i+j) % 2 == 1) {
+				mask->at({j,i}, new Constant(-1));
+			} else {
+				mask->at({j,i}, new Constant(1));
+			}
+		}
+	}
+	return result->multiply(*mask)->transpose({1,0})->multiply(*idet);
+}
+
+
+std::vector<unsigned int>	getDimIdx(std::vector<unsigned int> dims, unsigned int idx) {
+	std::vector<unsigned int> didx;
+	for (unsigned int I = 0; I< dims.size(); I++) {
+		unsigned int i = dims.size() - (I+1);
+		if (idx == 0) {
+			didx.push_back(0);
+		} else {
+			unsigned int tmp = idx % dims[i];
+			didx.push_back(tmp);
+			idx /= dims[i];
+		}
+	}
+	std::reverse(didx.begin(), didx.end());
+	return didx;
+}
+
+Tensor *Tensor::transpose(std::vector<unsigned int>permutations) const {
+    if (dims.size() != permutations.size())
+        throw TensorException("Tensor transpose permutations must be equals to the tensor dimensions", this);
+	std::vector<unsigned int> newdims;
+	for (unsigned int i = 0; i < permutations.size(); i++) {
+		if (permutations[i] >= dims.size())
+        	throw TensorException("Tensor transpose permutation out of original dimension", this);
+		for (unsigned int j = 0; j < i; j++) {
+			if (permutations[i] == permutations[j])
+        		throw TensorException("Tensor transpose permutation used twice", this);
+		}
+		newdims.push_back(dims[permutations[i]]);
+	}
+    Tensor *result = new Tensor(newdims);
+	for (unsigned int i = 0; i < len; i++) {
+		std::vector<unsigned int> didx = getDimIdx(dims, i);
+		std::vector<unsigned int> nidx;
+		for (unsigned int j = 0; j < didx.size(); j++) {
+			nidx.push_back(didx[permutations[j]]);
+		}
+		result->at(nidx, content[i]);
+	}
+	return result;
+}
+
+Tensor *Tensor::determinant() const {
+    static unsigned int c = 0;
+
+    if (dims.size() != 2)
+        throw TensorException("Matrix determinant can only be done with 2 dimensional matrix", this);
+    if (dims[0] != dims[1])
+        throw TensorException("Matrix determinant can only be done with square matrix", this);
+    Number *determinant;
+	if (dims[0] == 2) {
+		determinant = new Substraction(new Multiplication(at({0,0}), at({1,1})), new Multiplication(at({0,1}), at({1,0})));
+	}
+	else {
+		determinant = new Multiplication(at({0,0}), &minor(0,0)->determinant()->asNumber());
+    	for (unsigned int i = 1; i < dims[1]; i++) {
+			Number *xminor = new Multiplication(at({0,i}), &minor(i,0)->determinant()->asNumber());
+			if (i%2 == 0) {
+				determinant = new Addition(determinant, xminor);
+			} else {
+				determinant = new Substraction(determinant, xminor);
+			}
+		}
+	}
+	Tensor *result =  new Tensor(determinant);
+    c+=1;
+    result->name = "determinant" + std::to_string(c);
     return result;
 }
 
