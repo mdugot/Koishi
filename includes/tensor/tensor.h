@@ -56,8 +56,8 @@ class Tensor {
         Tensor *pow(const Tensor &tensor) const;
         Tensor *multiply(const Tensor &tensor) const;
         Tensor *inverse() const;
+        Tensor *negative() const;
         Tensor *sigmoid() const;
-        Tensor *gaussianLikehood(const Tensor &mean, const Tensor &std) const;
         Tensor *sum() const;
         Tensor *count() const;
         Tensor *std() const;

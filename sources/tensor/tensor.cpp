@@ -314,15 +314,22 @@ Tensor *Tensor::add(const Tensor &tensor) const {
 
 Tensor *Tensor::pow(const Tensor &tensor) const {
     static unsigned int c = 0;
-    if (sameShape(tensor) == false && tensor.dims.size() > 0)
+    if (sameShape(tensor) == false && tensor.dims.size() > 0 && dims.size() > 0)
         throw TensorException("can not pow tensor of different shapes", this, &tensor);
     c+=1;
-    Tensor *result = new Tensor(dims);
-    if (tensor.dims.size() == 0) {
+    Tensor *result;
+    if (dims.size() == 0) {
+    	result = new Tensor(tensor.dims);
+        for (unsigned int i = 0; i < tensor.len; i++) {
+            result->setContent(i, new Pow(content[0], tensor.content[i]));
+        }
+    } else if (tensor.dims.size() == 0) {
+    	result = new Tensor(dims);
         for (unsigned int i = 0; i < len; i++) {
             result->setContent(i, new Pow(content[i], tensor.content[0]));
         }
     } else {
+    	result = new Tensor(dims);
         for (unsigned int i = 0; i < len; i++) {
             result->setContent(i, new Pow(content[i], tensor.content[i]));
         }
@@ -361,6 +368,17 @@ Tensor *Tensor::inverse() const {
     return result;
 }
 
+Tensor *Tensor::negative() const {
+    static unsigned int c = 0;
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Negative(content[i]));
+    }
+    c+=1;
+    result->name = "negative" + std::to_string(c);
+    return result;
+}
+
 Tensor *Tensor::sigmoid() const {
     static unsigned int c = 0;
     Tensor *result = new Tensor(dims);
@@ -369,43 +387,6 @@ Tensor *Tensor::sigmoid() const {
     }
     c+=1;
     result->name = "sigmoid" + std::to_string(c);
-    return result;
-}
-
-Tensor *Tensor::gaussianLikehood(const Tensor &mean, const Tensor &std) const {
-    static unsigned int c = 0;
-
-    if (mean.dims.size() > 0)
-        throw TensorException("gaussian likehood mean must be a scallar", this, &mean);
-    if (std.dims.size() > 0)
-        throw TensorException("gaussian likehood standard deviation must be a scallar", this, &std);
-    Tensor *result = new Tensor(dims);
-    for (unsigned int i = 0; i < len; i++) {
-        Number *factor = new Inverse(new Multiplication(
-            &std.asNumber(),
-            new Pow(
-                new Constant(2*M_PI),
-                new Constant(0.5)
-            )
-        ));
-        Number *power = new Multiplication(
-            new Constant(-0.5),
-            new Pow(
-                new Division(
-                    new Substraction(content[i], &mean.asNumber()),
-                    &std.asNumber()
-                ),
-                new Constant(2)
-            )
-        );
-        (void)factor;
-        (void)power;
-        Number *gauss = new Multiplication(factor, new Pow(new Constant(M_E), power));
-        //Number *gauss = power;
-        result->setContent(i, gauss);
-    }
-    c+=1;
-    result->name = "gaussian" + std::to_string(c);
     return result;
 }
 
