@@ -99,6 +99,9 @@ BOOST_PYTHON_MODULE(koishi)
 
     class_<Tensors>("Tensors", no_init)
         .def("__str__", &Tensors::__str__)
+        .def("sigmoid", &Tensors::sigmoid, return_value_policy<manage_new_object>())
+        .def("add", &Tensors::addRaw, return_value_policy<manage_new_object>())
+        .def("add", &Tensors::addTensor, return_value_policy<manage_new_object>())
     ;
 }
 

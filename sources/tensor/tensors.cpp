@@ -24,13 +24,22 @@ Tensors::Tensors(const Tensor *from, unsigned int splitAxis)
         throw TensorException("split axis greater than origin dimension", from);
     std::vector<unsigned int> idx(splitAxis+1, 0);
     do {
-        for (unsigned int i = 0; i < idx.size(); i++)
-            DEBUG << idx[i] << " ";
-        DEBUG  << "\n";
         Tensor *tensor = from->gather(idx);
         this->content.push_back(tensor);
     } while (incrementVectorIdx(dims, idx));
 }
+
+Tensors::Tensors()
+{
+}
+
+Tensors::~Tensors()
+{
+    for (unsigned int i = 0; i < content.size(); i++) {
+        delete content[i];
+    }
+}
+
 
 std::string Tensors::toString()
 {
@@ -40,4 +49,12 @@ std::string Tensors::toString()
         str += "\n";
     }
     return str;
+}
+
+void Tensors::append(Tensor *tensor) {
+    if (content.size() > 0) {
+        if (content[0]->sameShape(*tensor) == false)
+            throw TensorException("can not append tensor of different shapes", tensor);
+    }
+    content.push_back(tensor);
 }

@@ -146,8 +146,9 @@ Tensor::Tensor(std::string group, Initializer *initializer) : Tensor({}, group, 
 
 Tensor::~Tensor() {
     counter -= 1;
-    for (unsigned int i = 0; i < len; i++)
+    for (unsigned int i = 0; i < len; i++) {
         unsetContent(i);
+    }
     delete content;
 }
 
