@@ -87,7 +87,7 @@ BOOST_PYTHON_MODULE(koishi)
         .def("matinv", &Tensor::matinv, return_value_policy<manage_new_object>())
         .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
         .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
-        .def("gather", &Tensor::gather, return_value_policy<manage_new_object>())
+        .def("gather", &Tensor::gatherFromList, return_value_policy<manage_new_object>())
         .def("split", &Tensor::split, return_value_policy<manage_new_object>())
         .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
@@ -102,6 +102,9 @@ BOOST_PYTHON_MODULE(koishi)
         .def("sigmoid", &Tensors::sigmoid, return_value_policy<manage_new_object>())
         .def("add", &Tensors::addRaw, return_value_policy<manage_new_object>())
         .def("add", &Tensors::addTensor, return_value_policy<manage_new_object>())
+        .def("add", &Tensors::add, return_value_policy<manage_new_object>())
+        .def("__getitem__", &Tensors::get, return_internal_reference<>())
+        .def("merge", &Tensors::mergeFromList, return_internal_reference<>())
     ;
 }
 

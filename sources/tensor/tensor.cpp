@@ -60,6 +60,10 @@ unsigned int Tensor::counter = 0;
     Tensor *Tensor::transposeFromList(list& permutations) {
         return transpose(listToVector<unsigned int>(permutations));
     }
+
+    Tensor *Tensor::gatherFromList(list& idx) {
+        return gather(listToVector<unsigned int>(idx));
+    }
 #endif
 
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
@@ -111,6 +115,25 @@ Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origi
     for (unsigned int i = 0; i < len; i++) {
         content[i] = NULL;
         setContent(i, origin->content[start+i]);
+    }
+}
+
+Tensor::Tensor(const Tensors *origin, std::vector<unsigned int> dims) : dims(dims)
+{
+    counter += 1;
+    static unsigned int c = 0;
+    c+=1;
+    name = "merge" + std::to_string(c);
+    len = calculateLen();
+    this->content = new Number*[len];
+    unsigned int idx = 0;
+    for (unsigned int i = 0; i < origin->size(); i++) {
+        Tensor *tmp = origin->get(i);
+        for (unsigned int j = 0; j < tmp->len; j++) {
+            content[idx] = NULL;
+            setContent(idx, tmp->content[j]);
+            idx += 1;
+        }
     }
 }
 

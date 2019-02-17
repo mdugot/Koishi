@@ -58,3 +58,23 @@ void Tensors::append(Tensor *tensor) {
     }
     content.push_back(tensor);
 }
+
+Tensor* Tensors::get(unsigned int i) const {
+    if (i >= content.size())
+        throw TensorException("index out of bound");
+    return content[i];
+}
+
+Tensor* Tensors::merge(std::vector<unsigned int> dims) {
+    unsigned int total = 1;
+    for (unsigned int i = 0; i < dims.size(); i++) {
+        total *= dims[i];
+    }
+    if (total != content.size())
+        throw TensorException("merge dimensions do not match total number of elements");
+    auto contentDims = content[0]->getDims();
+    for (unsigned int i = 0; i < contentDims.size(); i++) {
+        dims.push_back(contentDims[i]);
+    }
+    return new Tensor(this, dims);
+}
