@@ -8,6 +8,7 @@
 #include "initializer/initializer.h"
 
 class Sum;
+class Tensors;
 #ifdef PYTHON_WRAPPER
 class InitializerWrapper;
 #endif
@@ -16,12 +17,14 @@ class Tensor {
 
     private:
         Tensor(std::vector<unsigned int> dims);
+
         std::vector<unsigned int> dims;
         unsigned int len;
         Number** content;
+
         std::string name;
         Tensor getTmp(unsigned int idx) const;
-        
+
 
     public:
         static unsigned int counter;
@@ -32,10 +35,12 @@ class Tensor {
         Tensor(std::string group, Initializer *initializer);
         Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer);
         Tensor(const Tensor *origin, unsigned int idx);
+        Tensor(const Tensor *origin, std::vector<unsigned int> idx);
         ~Tensor();
 
         inline void setName(std::string str) {name = str;}
         inline std::string getName() {return name;}
+        inline std::vector<unsigned int> getDims() const {return dims;}
         void setContent(unsigned int idx, Number *number);
         void unsetContent(unsigned int idx);
         unsigned int calculateLen();
@@ -52,6 +57,8 @@ class Tensor {
         Tensor *shape();
         Tensor *operator[](unsigned int idx) const;
         Tensor *get(unsigned int idx) const;
+        Tensor *gather(std::vector<unsigned int> idx) const;
+        Tensors *split(unsigned int splitAxis) const;
         Tensor *add(const Tensor &tensor) const;
         Tensor *pow(const Tensor &tensor) const;
         Tensor *multiply(const Tensor &tensor) const;
@@ -62,11 +69,11 @@ class Tensor {
         Tensor *count() const;
         Tensor *std() const;
         Tensor *matmul(const Tensor &tensor) const;
-		Tensor *minor(unsigned int X, unsigned int Y) const;
-		Tensor *determinant() const;
-		Tensor *minorMatrix() const;
-		Tensor *matinv() const;
-		Tensor *transpose(std::vector<unsigned int>permutations) const;
+        Tensor *minor(unsigned int X, unsigned int Y) const;
+        Tensor *determinant() const;
+        Tensor *minorMatrix() const;
+        Tensor *matinv() const;
+        Tensor *transpose(std::vector<unsigned int>permutations) const;
         Tensor *percentile(FLOAT percent) const;
 
         inline Tensor *addRaw(FLOAT rawValue) const {return add(Tensor(rawValue));}
@@ -94,7 +101,7 @@ class Tensor {
         Tensor(std::string group, FLOAT value);
         Tensor(std::string group, boost::python::numpy::ndarray &a);
         boost::python::object evalForPython();
-		Tensor *transposeFromList(list& permutations);
+        Tensor *transposeFromList(list& permutations);
         #endif
 };
 

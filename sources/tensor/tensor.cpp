@@ -1,4 +1,5 @@
 #include "tensor/tensor.h"
+#include "tensor/tensors.h"
 #include "operation/variable.h"
 #include "operation/constant.h"
 #include "operation/addition.h"
@@ -56,9 +57,9 @@ unsigned int Tensor::counter = 0;
         wrap.initializer
     ){}
 
-	Tensor *Tensor::transposeFromList(list& permutations) {
-		return transpose(listToVector<unsigned int>(permutations));
-	}
+    Tensor *Tensor::transposeFromList(list& permutations) {
+        return transpose(listToVector<unsigned int>(permutations));
+    }
 #endif
 
 Tensor::Tensor(std::vector<unsigned int> dims) : dims(dims)
@@ -84,6 +85,32 @@ Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
     for (unsigned int i = 0; i < len; i++) {
         content[i] = NULL;
         setContent(i, origin->content[len*idx + i]);
+    }
+}
+
+Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origin->dims)
+{
+    counter += 1;
+    name = origin->name + "[";
+    unsigned int start = 0;
+    for (unsigned int i = 0; i < idx.size(); i++) {
+        if (i > 0) {
+            start *= dims[0];
+            name += ",";
+        }
+        name += std::to_string(idx[i]);
+        start += idx[i];
+        dims.erase(dims.begin());
+    }
+    name += "]";
+    for (unsigned int i = 0; i < dims.size(); i++) {
+        start *= dims[i];
+    }
+    len = calculateLen();
+    this->content = new Number*[len];
+    for (unsigned int i = 0; i < len; i++) {
+        content[i] = NULL;
+        setContent(i, origin->content[start+i]);
     }
 }
 
@@ -127,7 +154,7 @@ Tensor::~Tensor() {
 void Tensor::setContent(unsigned int idx, Number *number) {
     if (content[idx]) {
         unsetContent(idx);
-	}
+    }
     content[idx] = number;
     number->usedBy += 1;
 }
@@ -173,6 +200,22 @@ Tensor *Tensor::get(unsigned int idx) const {
     if (idx >= dims[0])
         throw TensorException("Index out of bounds", this);
     return new Tensor(this, idx);
+}
+
+Tensor *Tensor::gather(std::vector<unsigned int> idx) const {
+    if (dims.size() == 0)
+        throw TensorException("can not access element of 0 dimensional tensor", this);
+    if (idx.size() > dims.size())
+        throw TensorException("Index out of bounds", this);
+    for (unsigned int i = 1; i < idx.size(); i++) {
+        if (idx[i] >= dims[i])
+            throw TensorException("Index out of bounds", this);
+    }
+    return new Tensor(this, idx);
+}
+
+Tensors *Tensor::split(unsigned int splitAxis) const {
+    return new Tensors(this, splitAxis);
 }
 
 Tensor Tensor::getTmp(unsigned int idx) const {
@@ -231,7 +274,7 @@ std::string Tensor::header() const {
 }
 
 std::string Tensor::toString(bool printGradient, int margin) const {
-    
+
     std::string str = "";
     if (margin == 0) {
         str += header() + " : " + NL;
@@ -319,17 +362,17 @@ Tensor *Tensor::pow(const Tensor &tensor) const {
     c+=1;
     Tensor *result;
     if (dims.size() == 0) {
-    	result = new Tensor(tensor.dims);
+        result = new Tensor(tensor.dims);
         for (unsigned int i = 0; i < tensor.len; i++) {
             result->setContent(i, new Pow(content[0], tensor.content[i]));
         }
     } else if (tensor.dims.size() == 0) {
-    	result = new Tensor(dims);
+        result = new Tensor(dims);
         for (unsigned int i = 0; i < len; i++) {
             result->setContent(i, new Pow(content[i], tensor.content[0]));
         }
     } else {
-    	result = new Tensor(dims);
+        result = new Tensor(dims);
         for (unsigned int i = 0; i < len; i++) {
             result->setContent(i, new Pow(content[i], tensor.content[i]));
         }
@@ -412,6 +455,7 @@ Tensor *Tensor::matmul(const Tensor &tensor) const {
     return result;
 }
 
+
 Tensor *Tensor::minor(unsigned int X, unsigned int Y) const {
     static unsigned int c = 0;
 
@@ -420,19 +464,19 @@ Tensor *Tensor::minor(unsigned int X, unsigned int Y) const {
     if (X >= dims[1] || Y >= dims[0])
         throw TensorException("Matrix minor indexs out limit", this);
     Tensor *result = new Tensor({dims[0]-1, dims[1]-1});
-	unsigned x = 0;
-	unsigned y = 0;
+    unsigned x = 0;
+    unsigned y = 0;
     for (unsigned int i = 0; i < dims[1]; i++) {
-		if (i != X) {
-			y = 0;
-        	for (unsigned int j = 0; j < dims[0]; j++) {
-				if (j != Y) {
-	    	        result->at({y,x}, at({j,i}));
-					y++;
-				}
-        	}
-			x++;
-		}
+        if (i != X) {
+            y = 0;
+            for (unsigned int j = 0; j < dims[0]; j++) {
+                if (j != Y) {
+                    result->at({y,x}, at({j,i}));
+                    y++;
+                }
+            }
+            x++;
+        }
     }
     c+=1;
     result->name = "minor_" + std::to_string(c);
@@ -445,11 +489,11 @@ Tensor *Tensor::minorMatrix() const {
     Tensor *result = new Tensor(dims);
     for (unsigned int i = 0; i < dims[1]; i++) {
         for (unsigned int j = 0; j < dims[0]; j++) {
-			Number *n = &minor(i, j)->determinant()->asNumber();
-			result->at({j,i}, n);
-		}
-	}
-	return result;
+            Number *n = &minor(i, j)->determinant()->asNumber();
+            result->at({j,i}, n);
+        }
+    }
+    return result;
 }
 
 Tensor *Tensor::matinv() const {
@@ -457,61 +501,61 @@ Tensor *Tensor::matinv() const {
         throw TensorException("Matrix inverse can only be build from 2 dimensional matrix", this);
     if (dims[0] != dims[1])
         throw TensorException("Matrix inverse can only be done with square matrix", this);
-	Tensor *idet = determinant()->inverse();
+    Tensor *idet = determinant()->inverse();
     Tensor *mask = new Tensor(dims);
     Tensor *result = minorMatrix();
     for (unsigned int i = 0; i < dims[1]; i++) {
         for (unsigned int j = 0; j < dims[0]; j++) {
-			if ((i+j) % 2 == 1) {
-				mask->at({j,i}, new Constant(-1));
-			} else {
-				mask->at({j,i}, new Constant(1));
-			}
-		}
-	}
-	return result->multiply(*mask)->transpose({1,0})->multiply(*idet);
+            if ((i+j) % 2 == 1) {
+                mask->at({j,i}, new Constant(-1));
+            } else {
+                mask->at({j,i}, new Constant(1));
+            }
+        }
+    }
+    return result->multiply(*mask)->transpose({1,0})->multiply(*idet);
 }
 
 
-std::vector<unsigned int>	getDimIdx(std::vector<unsigned int> dims, unsigned int idx) {
-	std::vector<unsigned int> didx;
-	for (unsigned int I = 0; I< dims.size(); I++) {
-		unsigned int i = dims.size() - (I+1);
-		if (idx == 0) {
-			didx.push_back(0);
-		} else {
-			unsigned int tmp = idx % dims[i];
-			didx.push_back(tmp);
-			idx /= dims[i];
-		}
-	}
-	std::reverse(didx.begin(), didx.end());
-	return didx;
+std::vector<unsigned int>    getDimIdx(std::vector<unsigned int> dims, unsigned int idx) {
+    std::vector<unsigned int> didx;
+    for (unsigned int I = 0; I< dims.size(); I++) {
+        unsigned int i = dims.size() - (I+1);
+        if (idx == 0) {
+            didx.push_back(0);
+        } else {
+            unsigned int tmp = idx % dims[i];
+            didx.push_back(tmp);
+            idx /= dims[i];
+        }
+    }
+    std::reverse(didx.begin(), didx.end());
+    return didx;
 }
 
 Tensor *Tensor::transpose(std::vector<unsigned int>permutations) const {
     if (dims.size() != permutations.size())
         throw TensorException("Tensor transpose permutations must be equals to the tensor dimensions", this);
-	std::vector<unsigned int> newdims;
-	for (unsigned int i = 0; i < permutations.size(); i++) {
-		if (permutations[i] >= dims.size())
-        	throw TensorException("Tensor transpose permutation out of original dimension", this);
-		for (unsigned int j = 0; j < i; j++) {
-			if (permutations[i] == permutations[j])
-        		throw TensorException("Tensor transpose permutation used twice", this);
-		}
-		newdims.push_back(dims[permutations[i]]);
-	}
+    std::vector<unsigned int> newdims;
+    for (unsigned int i = 0; i < permutations.size(); i++) {
+        if (permutations[i] >= dims.size())
+            throw TensorException("Tensor transpose permutation out of original dimension", this);
+        for (unsigned int j = 0; j < i; j++) {
+            if (permutations[i] == permutations[j])
+                throw TensorException("Tensor transpose permutation used twice", this);
+        }
+        newdims.push_back(dims[permutations[i]]);
+    }
     Tensor *result = new Tensor(newdims);
-	for (unsigned int i = 0; i < len; i++) {
-		std::vector<unsigned int> didx = getDimIdx(dims, i);
-		std::vector<unsigned int> nidx;
-		for (unsigned int j = 0; j < didx.size(); j++) {
-			nidx.push_back(didx[permutations[j]]);
-		}
-		result->at(nidx, content[i]);
-	}
-	return result;
+    for (unsigned int i = 0; i < len; i++) {
+        std::vector<unsigned int> didx = getDimIdx(dims, i);
+        std::vector<unsigned int> nidx;
+        for (unsigned int j = 0; j < didx.size(); j++) {
+            nidx.push_back(didx[permutations[j]]);
+        }
+        result->at(nidx, content[i]);
+    }
+    return result;
 }
 
 Tensor *Tensor::determinant() const {
@@ -522,21 +566,21 @@ Tensor *Tensor::determinant() const {
     if (dims[0] != dims[1])
         throw TensorException("Matrix determinant can only be done with square matrix", this);
     Number *determinant;
-	if (dims[0] == 2) {
-		determinant = new Substraction(new Multiplication(at({0,0}), at({1,1})), new Multiplication(at({0,1}), at({1,0})));
-	}
-	else {
-		determinant = new Multiplication(at({0,0}), &minor(0,0)->determinant()->asNumber());
-    	for (unsigned int i = 1; i < dims[1]; i++) {
-			Number *xminor = new Multiplication(at({0,i}), &minor(i,0)->determinant()->asNumber());
-			if (i%2 == 0) {
-				determinant = new Addition(determinant, xminor);
-			} else {
-				determinant = new Substraction(determinant, xminor);
-			}
-		}
-	}
-	Tensor *result =  new Tensor(determinant);
+    if (dims[0] == 2) {
+        determinant = new Substraction(new Multiplication(at({0,0}), at({1,1})), new Multiplication(at({0,1}), at({1,0})));
+    }
+    else {
+        determinant = new Multiplication(at({0,0}), &minor(0,0)->determinant()->asNumber());
+        for (unsigned int i = 1; i < dims[1]; i++) {
+            Number *xminor = new Multiplication(at({0,i}), &minor(i,0)->determinant()->asNumber());
+            if (i%2 == 0) {
+                determinant = new Addition(determinant, xminor);
+            } else {
+                determinant = new Substraction(determinant, xminor);
+            }
+        }
+    }
+    Tensor *result =  new Tensor(determinant);
     c+=1;
     result->name = "determinant" + std::to_string(c);
     return result;

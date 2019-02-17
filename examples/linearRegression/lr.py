@@ -10,7 +10,7 @@ class lr:
         self.initVariable = koishi.fillInitializer(0)
         self.feedInputs = koishi.feedInitializer()
         self.feedOutputs = koishi.feedInitializer()
-        
+
         self.inputs = koishi.Variable([len(self.km),1], "inputs", self.feedInputs)
         self.outputs = koishi.Variable([len(self.km),1], "outputs", self.feedOutputs)
         self.theta0 = koishi.Variable("variable", self.initVariable)
@@ -19,7 +19,6 @@ class lr:
         self.estimation = self.inputs.matmul(self.theta1).add(self.theta0)
         self.cost = self.estimation.substract(self.outputs).pow(2).sum().divide(self.m.multiply(2))
 
-    
         self.feedPrediction = koishi.feedInitializer()
         self.oneInput = koishi.Variable("oneInput", self.feedPrediction)
         self.prediction = self.oneInput.multiply(self.theta1[0][0]).add(self.theta0)
@@ -67,8 +66,7 @@ class lr:
             p = self.predict(toPredict)
             plt.plot([toPredict], [p], 'gx')
         plt.show()
-        
-    
+
     def train(self, epoch, learningRate, optim = None):
         self.feedInputs.feed(self.km)
         self.feedOutputs.feed(self.price)

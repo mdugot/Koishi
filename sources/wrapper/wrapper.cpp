@@ -1,5 +1,5 @@
 #ifdef PYTHON_WRAPPER
-#include "tensor/tensor.h"
+#include "tensor/tensors.h"
 #include "operation/variable.h"
 
 char const* greet()
@@ -13,7 +13,6 @@ BOOST_PYTHON_MODULE(koishi)
     np::initialize();
 
     def("greet", greet);
-    
 
     def("initializeAll", &Initializer::initializeAll);
     def("save", &Variable::save);
@@ -88,12 +87,18 @@ BOOST_PYTHON_MODULE(koishi)
         .def("matinv", &Tensor::matinv, return_value_policy<manage_new_object>())
         .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
         .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
+        .def("gather", &Tensor::gather, return_value_policy<manage_new_object>())
+        .def("split", &Tensor::split, return_value_policy<manage_new_object>())
         .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
         .def("gradientReinit", &Tensor::gradientReinit)
         .def("show", &Tensor::printGradient)
 
         .add_property("name", &Tensor::getName, &Tensor::setName)
+    ;
+
+    class_<Tensors>("Tensors", no_init)
+        .def("__str__", &Tensors::__str__)
     ;
 }
 
