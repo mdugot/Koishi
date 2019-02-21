@@ -13,6 +13,7 @@ class lr:
 
         self.data = np.nan_to_num(self.readFeatures(filename))
         self.kdata = koishi.Tensor(self.data).transpose([1,0])
+        #self.normalize()
         self.description = {}
         self.description["Count"] = []
         self.description["Mean"] = []
@@ -32,6 +33,14 @@ class lr:
             self.description["75%"].append(self.kdata[idx].percentile(75))
             self.description["Max"].append(self.kdata[idx].max())
         koishi.initializeAll()
+
+    def normalize(self):
+        shape = [int(self.kdata.shape().eval()[0])]
+        print(shape)
+        splitData = self.kdata.split(0)
+        normalizeData = splitData.substract(splitData.mean()).divide(splitData.range())
+        self.kdata = normalizeData.merge(shape)
+
 
     def describe(self):
         padding = 12
@@ -63,3 +72,5 @@ class lr:
 if __name__ == "__main__":
     data = lr("dataset_train.csv")
     data.describe()
+    data.normalize()
+    print(data.kdata.mean())

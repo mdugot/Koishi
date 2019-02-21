@@ -52,11 +52,12 @@ FeedWrapper *getFeedInitializer() {
 
 object Tensor::evalForPython() {
     if (dims.size() == 0)
-        return object(content[0]->eval());
+        return object(content[0]->fastEval());
     list result;
     for (unsigned int i = 0; i < dims[0]; i++) {
         result.append(getTmp(i).evalForPython());
     }
+    Number::globalEvalCount += 1;
     return result;
 }
 

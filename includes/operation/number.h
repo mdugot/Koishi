@@ -15,9 +15,13 @@ class Number {
 
     protected:
         FLOAT gradient;
+        FLOAT store;
+        unsigned int localEvalCount;
 
     public:
         static unsigned int count;
+        static unsigned int globalEvalCount;
+
         static void reinitAllGradient(std::string group);
         static void optimizeByGradientDescent(std::string group, FLOAT learningRate);
         static void optimizeByMomentum(std::string group, FLOAT learningRate, FLOAT momentumCoef);
@@ -35,6 +39,7 @@ class Number {
         Number();
         virtual ~Number();
         void unset();
+        FLOAT fastEval();
         virtual FLOAT eval() = 0;
         virtual FLOAT derivate(Variable *from) = 0;
         virtual void reinitGradient();

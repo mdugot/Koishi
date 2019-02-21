@@ -86,6 +86,7 @@ class Tensor {
         inline Tensor *substractRaw(FLOAT rawValue) const {return substract(Tensor(rawValue));}
         inline Tensor *max() const {return percentile(100);}
         inline Tensor *min() const {return percentile(0);}
+        inline Tensor *range() const {return max()->substract(*min());}
         inline Tensor *mean() const {return sum()->divide(*count());}
 
         void gradientReinit();
