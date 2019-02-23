@@ -4,7 +4,7 @@ Pow::Pow(Number *left, Number *right) : Operation(left, right)
 {
 }
 
-FLOAT Pow::eval() {
+FLOAT Pow::compute() {
     return pow(left->eval(), right->eval());
 }
 

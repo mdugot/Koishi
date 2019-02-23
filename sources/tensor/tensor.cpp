@@ -92,6 +92,18 @@ Tensor::Tensor(const Tensor *origin, unsigned int idx) : dims(origin->dims)
     }
 }
 
+Tensor::Tensor(const Tensor *origin) : dims(origin->dims)
+{
+    counter += 1;
+    name = origin->name + "_copy";
+    len = calculateLen();
+    this->content = new Number*[len];
+    for (unsigned int i = 0; i < len; i++) {
+        content[i] = NULL;
+        setContent(i, origin->content[i]);
+    }
+}
+
 Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origin->dims)
 {
     counter += 1;

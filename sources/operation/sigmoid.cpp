@@ -4,7 +4,7 @@ Sigmoid::Sigmoid(Number *base) : Transformation(base)
 {
 }
 
-FLOAT Sigmoid::eval() {
+FLOAT Sigmoid::compute() {
     return 1 / (1 + exp(-base->eval()));
 }
 

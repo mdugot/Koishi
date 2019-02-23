@@ -35,10 +35,12 @@ class Tensor {
         Tensor(std::string group, Initializer *initializer);
         Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer);
         Tensor(const Tensor *origin, unsigned int idx);
+        Tensor(const Tensor *origin);
         Tensor(const Tensor *origin, std::vector<unsigned int> idx);
         Tensor(const Tensors *origin, std::vector<unsigned int> dims);
         ~Tensor();
 
+        inline Tensor* clone() {return new Tensor(this);}
         inline void setName(std::string str) {name = str;}
         inline std::string getName() {return name;}
         inline std::vector<unsigned int> getDims() const {return dims;}

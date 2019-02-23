@@ -8,7 +8,7 @@ class Count : public Reduction {
 
     public:
         Count(std::vector<Number*> vector);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT oneDerivative(unsigned int idx);
 };
 

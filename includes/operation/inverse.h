@@ -8,7 +8,7 @@ class Inverse : public Transformation {
 
     public:
         Inverse(Number *base);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT baseDerivative();
 };
 #endif

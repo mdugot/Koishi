@@ -3,9 +3,9 @@
 #include "tensor/tensor.h"
 
 unsigned int Number::count = 0;
-unsigned int Number::globalEvalCount = 1;
+unsigned int Number::globalPhase = 1;
 
-Number::Number() : gradient(0), store(0.0), localEvalCount(0), usedBy(0)
+Number::Number() : memory(0), localPhase(0), gradient(0), usedBy(0)
 {
     count += 1;
 }
@@ -19,6 +19,14 @@ void Number::unset() {
     if (usedBy == 0) {
         delete this;
     }
+}
+
+FLOAT Number::eval() {
+    if (localPhase != globalPhase) {
+        localPhase = globalPhase;
+        memory = compute();
+    }
+    return memory;
 }
 
 void Number::calculateGradient(FLOAT gradient) {
@@ -35,16 +43,6 @@ FLOAT Number::gradientChecking(Variable *from) {
     FLOAT r2 = eval();
     from->setValue(origin);
     return (r2-r1) / (2*EPSILON);
-}
-
-FLOAT Number::fastEval() {
-    if (localEvalCount != globalEvalCount) {
-        store = eval();
-        localEvalCount = globalEvalCount;
-    } else {
-        DEBUG << "no eval need\n";
-    }
-    return store;
 }
 
 void Number::reinitGradient() {

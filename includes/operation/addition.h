@@ -8,7 +8,7 @@ class Addition : public Operation {
 
     public:
         Addition(Number *left, Number *right);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT leftDerivative();
         virtual FLOAT rightDerivative();
 };

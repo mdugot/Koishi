@@ -37,12 +37,11 @@ void Variable::load(std::string filename) {
         if (p == std::string::npos)
             throw NumberException("format error in the line '" + line + "'");
         std::string id = line.substr(0,p);
-        FLOAT value = STRING_TO_FLOAT(line.substr(p+1));
-//        DEBUG << "id : " << key << ", value : " << value << NL;
+        FLOAT v = STRING_TO_FLOAT(line.substr(p+1));
         if (variablesById.count(id) == 0) {
             throw NumberException("variable '" + id + "' does not exist");
         }
-        variablesById[id]->setValue(value);
+        variablesById[id]->setValue(v);
     }
     file.close();
 }
@@ -54,7 +53,7 @@ Variable::Variable(std::string group, std::string name, Initializer *initializer
         initializer->add(this);
 }
 
-Variable::Variable(std::string group, std::string name, FLOAT value) : Constant(value), name(name), group(group), momentum(0), squaredGradientAverage(0) {
+Variable::Variable(std::string group, std::string name, FLOAT v) : Constant(v), name(name), group(group), momentum(0), squaredGradientAverage(0) {
     initializer = NULL;
     std::string id = group + "/" + name;
     this->id = id;
@@ -87,21 +86,21 @@ FLOAT Variable::derivate(Variable *from) {
 }
 
 void Variable::gradientDescent(FLOAT learningRate) {
-    value -= gradient*learningRate;
+    setValue(getValue() - (gradient*learningRate));
 }
 
 void Variable::momentumOptim(FLOAT learningRate, FLOAT coef) {
     momentum = coef*momentum - gradient;
-    value += momentum*learningRate;
+    setValue(getValue() + (momentum*learningRate));
 }
 
 void Variable::RMSPropOptim(FLOAT learningRate, FLOAT coef) {
     squaredGradientAverage = coef*squaredGradientAverage + (1-coef)*(gradient*gradient);
-    value -= learningRate / (sqrt(squaredGradientAverage)+EPSILON) * gradient;
+    setValue(getValue() - (learningRate / (sqrt(squaredGradientAverage)+EPSILON) * gradient));
 }
 
 void Variable::adamOptim(FLOAT learningRate, FLOAT coef1, FLOAT coef2) {
     momentum = coef1*momentum + (1-coef1)*gradient;
     squaredGradientAverage = coef2*squaredGradientAverage + (1-coef2)*(gradient*gradient);
-    value -= learningRate * (momentum/(1-coef1)) / (sqrt((squaredGradientAverage/(1-coef2)))+EPSILON);
+    setValue(getValue() - (learningRate * (momentum/(1-coef1)) / (sqrt((squaredGradientAverage/(1-coef2)))+EPSILON)));
 }

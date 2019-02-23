@@ -27,7 +27,7 @@ unsigned int Percentile::getPercentIndex() {
     return (unsigned int)r;
 }
 
-FLOAT Percentile::eval() {
+FLOAT Percentile::compute() {
     unsigned int index = getPercentIndex();
     sort();
     return sortedVector[index]->eval();

@@ -14,7 +14,7 @@ Negative::Negative(Number *number) : Multiplication(number, new Constant(-1))
 {
 }
 
-FLOAT Multiplication::eval() {
+FLOAT Multiplication::compute() {
     return left->eval() * right->eval();
 }
 

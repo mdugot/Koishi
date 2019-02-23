@@ -29,17 +29,20 @@ class Tensors {
 
     public:
         Tensors(const Tensor *from, unsigned int splitAxis);
+        Tensors(const Tensors *from, std::vector<unsigned int> idxs);
         Tensors();
         ~Tensors();
 
         std::string toString();
         void append(Tensor *tensor);
         Tensor* get(unsigned int i) const;
+        Tensors* take(std::vector<unsigned int> idxs) const;
         Tensor* merge(std::vector<unsigned int>dims);
         inline unsigned int size() const {return content.size();}
         #ifdef PYTHON_WRAPPER
         inline std::string __str__() {return toString();}
         inline Tensor *mergeFromList(list& dims) {return merge(listToVector<unsigned int>(dims));}
+        inline Tensors *takeFromList(list& idxs) {return take(listToVector<unsigned int>(idxs));}
         #endif
 
         inline Tensors* divideRaw(FLOAT value) const {

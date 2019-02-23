@@ -5,7 +5,7 @@ Constant::Constant(FLOAT v) : Number()
     this->value = v;
 }
 
-FLOAT Constant::eval() {
+FLOAT Constant::compute() {
     return value;
 }
 

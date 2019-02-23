@@ -14,13 +14,13 @@ class Tensor;
 class Number {
 
     protected:
+        FLOAT memory;
+        unsigned int localPhase;
         FLOAT gradient;
-        FLOAT store;
-        unsigned int localEvalCount;
 
     public:
         static unsigned int count;
-        static unsigned int globalEvalCount;
+        static unsigned int globalPhase;
 
         static void reinitAllGradient(std::string group);
         static void optimizeByGradientDescent(std::string group, FLOAT learningRate);
@@ -39,8 +39,8 @@ class Number {
         Number();
         virtual ~Number();
         void unset();
-        FLOAT fastEval();
-        virtual FLOAT eval() = 0;
+        FLOAT eval();
+        virtual FLOAT compute() = 0;
         virtual FLOAT derivate(Variable *from) = 0;
         virtual void reinitGradient();
         FLOAT gradientChecking(Variable *from);

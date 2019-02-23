@@ -117,8 +117,9 @@ BOOST_PYTHON_MODULE(koishi)
         .def("substract", &Tensors::substractRaw, return_value_policy<manage_new_object>())
         .def("substract", &Tensors::substractTensor, return_value_policy<manage_new_object>())
         .def("substract", &Tensors::substract, return_value_policy<manage_new_object>())
-        .def("__getitem__", &Tensors::get, return_internal_reference<>())
-        .def("merge", &Tensors::mergeFromList, return_internal_reference<>())
+        .def("__getitem__", &Tensors::get, return_value_policy<manage_new_object>())
+        .def("merge", &Tensors::mergeFromList, return_value_policy<manage_new_object>())
+        .def("take", &Tensors::takeFromList, return_value_policy<manage_new_object>())
     ;
 }
 

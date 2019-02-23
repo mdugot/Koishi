@@ -13,7 +13,7 @@ class Percentile : public Reduction {
 
     public:
         Percentile(std::vector<Number*> vector, FLOAT percent);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT oneDerivative(unsigned int idx);
 };
 

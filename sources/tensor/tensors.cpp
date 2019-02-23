@@ -29,6 +29,17 @@ Tensors::Tensors(const Tensor *from, unsigned int splitAxis)
     } while (incrementVectorIdx(dims, idx));
 }
 
+Tensors::Tensors(const Tensors *from, std::vector<unsigned int> idxs)
+{
+    for (unsigned int i = 0; i < idxs.size(); i++) {
+        unsigned int idx = idxs[i];
+        if (idx >= from->content.size())
+            throw TensorException("idx greater than tensors list size");
+        Tensor *tensor = from->get(idx);
+        this->content.push_back(tensor);
+    }
+}
+
 Tensors::Tensors()
 {
 }
@@ -62,7 +73,11 @@ void Tensors::append(Tensor *tensor) {
 Tensor* Tensors::get(unsigned int i) const {
     if (i >= content.size())
         throw TensorException("index out of bound");
-    return content[i];
+    return content[i]->clone();
+}
+
+Tensors* Tensors::take(std::vector<unsigned int> idxs) const {
+    return new Tensors(this, idxs);
 }
 
 Tensor* Tensors::merge(std::vector<unsigned int> dims) {

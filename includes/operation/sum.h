@@ -8,7 +8,7 @@ class Sum : public Reduction {
 
     public:
         Sum(std::vector<Number*> vector);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT oneDerivative(unsigned int idx);
 };
 

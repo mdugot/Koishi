@@ -4,7 +4,7 @@ Inverse::Inverse(Number *base) : Transformation(base)
 {
 }
 
-FLOAT Inverse::eval() {
+FLOAT Inverse::compute() {
     return 1 / base->eval();
 }
 

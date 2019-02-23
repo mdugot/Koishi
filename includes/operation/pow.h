@@ -8,7 +8,7 @@ class Pow : public Operation {
 
     public:
         Pow(Number *left, Number *right);
-        FLOAT eval();
+        FLOAT compute();
         virtual FLOAT leftDerivative();
         virtual FLOAT rightDerivative();
 };

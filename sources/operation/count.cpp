@@ -4,7 +4,7 @@ Count::Count(std::vector<Number*> vector) : Reduction(vector)
 {
 }
 
-FLOAT Count::eval() {
+FLOAT Count::compute() {
     return (FLOAT)vector.size();
 }
 

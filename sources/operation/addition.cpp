@@ -9,7 +9,7 @@ Addition::Addition(Number *left, Number *right) : Operation(left, right)
 {
 }
 
-FLOAT Addition::eval() {
+FLOAT Addition::compute() {
     return left->eval() + right->eval();
 }
 
