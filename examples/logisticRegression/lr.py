@@ -117,7 +117,14 @@ class lr:
 
     def readData(self, filename):
         rawData = np.genfromtxt(filename, names=True, delimiter=",", dtype=dataTypes)
-        return np.nan_to_num(self.getFeatures(rawData)), rawData[:][houseColumn]
+        houses = rawData[:][houseColumn]
+        data = self.getFeatures(rawData)
+        means = np.nanmean(data, axis=0)
+        print(means)
+        idxs = np.where(np.isnan(data))
+        print(idxs)
+        data[idxs] = np.take(means, idxs[1])
+        return data, houses
 
 if __name__ == "__main__":
     data = lr("dataset_train.csv")
