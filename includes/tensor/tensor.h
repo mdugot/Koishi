@@ -72,7 +72,7 @@ class Tensor {
         Tensor *count() const;
         Tensor *std() const;
         Tensor *matmul(const Tensor &tensor) const;
-        Tensor *minor(unsigned int X, unsigned int Y) const;
+        Tensor *minorXY(unsigned int X, unsigned int Y) const;
         Tensor *determinant() const;
         Tensor *minorMatrix() const;
         Tensor *matinv() const;

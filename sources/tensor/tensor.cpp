@@ -492,7 +492,7 @@ Tensor *Tensor::matmul(const Tensor &tensor) const {
 }
 
 
-Tensor *Tensor::minor(unsigned int X, unsigned int Y) const {
+Tensor *Tensor::minorXY(unsigned int X, unsigned int Y) const {
     static unsigned int c = 0;
 
     if (dims.size() != 2)
@@ -525,7 +525,7 @@ Tensor *Tensor::minorMatrix() const {
     Tensor *result = new Tensor(dims);
     for (unsigned int i = 0; i < dims[1]; i++) {
         for (unsigned int j = 0; j < dims[0]; j++) {
-            Number *n = &minor(i, j)->determinant()->asNumber();
+            Number *n = &minorXY(i, j)->determinant()->asNumber();
             result->at({j,i}, n);
         }
     }
@@ -606,9 +606,9 @@ Tensor *Tensor::determinant() const {
         determinant = new Substraction(new Multiplication(at({0,0}), at({1,1})), new Multiplication(at({0,1}), at({1,0})));
     }
     else {
-        determinant = new Multiplication(at({0,0}), &minor(0,0)->determinant()->asNumber());
+        determinant = new Multiplication(at({0,0}), &minorXY(0,0)->determinant()->asNumber());
         for (unsigned int i = 1; i < dims[1]; i++) {
-            Number *xminor = new Multiplication(at({0,i}), &minor(i,0)->determinant()->asNumber());
+            Number *xminor = new Multiplication(at({0,i}), &minorXY(i,0)->determinant()->asNumber());
             if (i%2 == 0) {
                 determinant = new Addition(determinant, xminor);
             } else {

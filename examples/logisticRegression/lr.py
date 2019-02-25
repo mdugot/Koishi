@@ -2,6 +2,8 @@ import koishi
 import random
 from tqdm import tqdm
 import numpy as np
+if np.__version__ >= '1.16':
+    import numpy.lib.recfunctions as rf
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -112,7 +114,10 @@ class lr:
             print("")
 
     def getFeatures(self, rawData):
-        data = rawData[:][featureNames].view(float)
+        if np.__version__ >= '1.16':
+            data = rf.structured_to_unstructured(rawData[:][featureNames]).view(float)
+        else:
+            data = rawData[:][featureNames].view(float)
         return np.array(data.reshape(len(rawData), len(featureNames)))
 
     def readData(self, filename):
