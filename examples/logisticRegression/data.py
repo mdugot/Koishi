@@ -18,7 +18,7 @@ houseColor = {
     "Gryffindor": 'red',
     "Slytherin": 'green'}
 
-class lr:
+class Data:
 
     def __init__(self, filename):
 
@@ -51,7 +51,8 @@ class lr:
             self.description["Max"].append(self.dataByCourse[idx].max())
 
         self.dataByCourse = self.normalize(self.dataByCourse)
-        self.dataByStudent = self.dataByCourse.transpose([1,0]).split(0)
+        self.trainData = self.dataByCourse.transpose([1,0])
+        self.dataByStudent = self.dataByStudent.split(0)
         koishi.initializeAll()
 
         self.houseDataByStudent = {}
@@ -131,8 +132,15 @@ class lr:
         data[idxs] = np.take(means, idxs[1])
         return data, houses
 
+    def size(self):
+        return len(self.trainData.eval())
+
+    def numberFeatures(self):
+        return len(self.trainData.eval()[0])
+
+
 if __name__ == "__main__":
-    data = lr("dataset_train.csv")
+    data = Data("dataset_train.csv")
     data.describe()
     print(data.dataByStudent[42])
     print(data.dataByStudent.take([42,0,42,1000]))
