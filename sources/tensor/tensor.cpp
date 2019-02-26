@@ -25,14 +25,14 @@ unsigned int Tensor::counter = 0;
     Tensor::Tensor(list &l)
     : Tensor(
         getListShape(l),
-        listToVector<FLOAT>(l)
+        listToVector_deep<FLOAT>(l)
     ){}
 
     Tensor::Tensor(std::string group, np::ndarray &a)
     : Tensor(
         getNumpyShape(a),
         group,
-        NULL
+        (Initializer*)NULL
     ){
         std::vector<FLOAT> values = numpyToVector(a);
         for (unsigned int i = 0; i < len; i++) {
@@ -46,9 +46,9 @@ unsigned int Tensor::counter = 0;
     : Tensor(
         getListShape(list),
         group,
-        NULL
+        (Initializer*)NULL
     ){
-        std::vector<FLOAT> values = listToVector<FLOAT>(list);
+        std::vector<FLOAT> values = listToVector_deep<FLOAT>(list);
         for (unsigned int i = 0; i < len; i++) {
             ((Constant*)content[i])->setValue(values[i]);
         }
@@ -190,7 +190,7 @@ Tensor::Tensor(Number *value) : Tensor(std::vector<unsigned int>())
 
 Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer) : Tensor(dims)
 {
-    if (initializer->getDims().size() > 0) {
+    if (initializer != NULL && initializer->getDims().size() > 0) {
         if (this->dims.size() != initializer->getDims().size()) {
             throw TensorException("wrong shape of initializer", this);
         }

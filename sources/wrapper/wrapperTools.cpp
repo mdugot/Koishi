@@ -4,7 +4,6 @@
 #include "tensor/tensorException.h"
 #include "initializer/uniform.h"
 #include "initializer/feed.h"
-#include "operation/numberException.h"
 
 InitializerWrapper::InitializerWrapper(Initializer *initializer) :initializer(initializer)
 {
@@ -26,7 +25,7 @@ FeedWrapper::~FeedWrapper() {
 }
 
 void FeedWrapper::feed(list &l) {
-    feeder->feed(getListShape(l), listToVector<FLOAT>(l));
+    feeder->feed(getListShape(l), listToVector_deep<FLOAT>(l));
 }
 
 void FeedWrapper::feedSimple(FLOAT value) {
@@ -48,7 +47,11 @@ InitializerWrapper *getFillInitializer(FLOAT value) {
 }
 
 FeedWrapper *getFeedInitializer() {
-    return new FeedWrapper(new Feed());
+    return new FeedWrapper(new Feed(std::vector<unsigned int>()));
+}
+
+FeedWrapper *getFeedInitializerFromList(list &l) {
+    return new FeedWrapper(new Feed(listToVector<unsigned int>(l)));
 }
 
 object Tensor::evalForPython() {
@@ -98,7 +101,7 @@ void appendListShape(list &l, std::vector<unsigned int> &v) {
         std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
         if (classname == "list" && len(extract<list>(l[i])) != nextShape) {
             throw TensorException("list has irregular shape");
-        } else if (nextShape != 0) {
+        } else if (classname != "list" && nextShape != 0) {
             throw TensorException("list has irregular shape");
         }
     }
@@ -108,14 +111,6 @@ std::vector<unsigned int> getListShape(list &l) {
     std::vector<unsigned int> v;
     appendListShape(l, v);
     return v;
-}
-
-Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap) {
-    return new Tensor(dims, group, wrap);
-}
-
-Tensor *newVariable(list &dims, InitializerWrapper &wrap) {
-    return new Tensor(dims, "", wrap);
 }
 
 Tensor *newSimpleVariable(InitializerWrapper &wrap) {

@@ -21,6 +21,7 @@ BOOST_PYTHON_MODULE(koishi)
 
     def("uniformInitializer", getUniformInitializer, return_value_policy<manage_new_object>());
     def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
+    def("feedInitializer", getFeedInitializerFromList, return_value_policy<manage_new_object>());
     def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
     def("gradientDescentOptim", Number::optimizeByGradientDescent);
@@ -35,13 +36,11 @@ BOOST_PYTHON_MODULE(koishi)
     def("adamOptim", Number::optimizeByAdamAll);
     def("gradientReinit", Number::reinitAllGradientAll);
 
-    def("Variable", newVariable, return_value_policy<manage_new_object>());
     def("Variable", newSimpleVariable, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumber, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpy, return_value_policy<manage_new_object>());
     def("Variable", newVariableList, return_value_policy<manage_new_object>());
 
-    def("Variable", newVariableWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newSimpleVariableWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumberWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpyWithGroup, return_value_policy<manage_new_object>());

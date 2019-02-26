@@ -3,12 +3,10 @@
 
 Feed::Feed() : Initializer()
 {
-    feed(std::vector<unsigned int>(), {0}, false);
 }
 
-Feed::Feed(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Initializer(dims)
+Feed::Feed(std::vector<unsigned int> dims) : Initializer(dims)
 {
-    feed(dims, values, false);
 }
 
 void Feed::feed(std::vector<unsigned int> dims, std::vector<FLOAT> values, bool doInit)
@@ -22,6 +20,8 @@ void Feed::feed(std::vector<unsigned int> dims, std::vector<FLOAT> values, bool 
                 throw NumberException("wrong shape of feed values");
             }
         }
+    } else if (values.size() > 1) {
+        throw NumberException("wrong shape of feed values");
     }
     if (values.size() == 0) {
         throw NumberException("Feed initializer must contain at least one value");
