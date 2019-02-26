@@ -14,6 +14,11 @@ Initializer::Initializer()
     all.push_back(this);
 }
 
+Initializer::Initializer(std::vector<unsigned int> dims) : Initializer()
+{
+    this->dims = dims;
+}
+
 Initializer::~Initializer()
 {
     all.remove(this);

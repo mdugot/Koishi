@@ -57,20 +57,11 @@ recpp: fcleancpp cpp
 ############################################################################
 
 PYLIBNAME= koishi.so
-
-#PYTHON_HEADER_DIRECTORY= /usr/include/python3.6
-#LIBRARY_DIRECTORY= /usr/lib/x86_64-linux-gnu 
-#PYTHON_LIBRARY= python3.6m 
-#WRAPPER_LIBRARY= boost_python3-py36 
-#NUMPY_LIBRARY= boost_numpy3
-
-PYTHON_HEADER_DIRECTORY= /usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/include/python3.7m/
-BOOST_HEADER_DIRECTORY= /usr/local/Cellar/boost/1.67.0_1/include/boost/
-BOOST_LIBRARY_DIRECTORY= /usr/local/Cellar/boost-python3/1.67.0_1/lib/
-PYTHON_LIBRARY_DIRECTORY= /usr/local/Cellar/python/3.7.0/Frameworks/Python.framework/Versions/3.7/lib/
-PYTHON_LIBRARY= python3.7m
-WRAPPER_LIBRARY= boost_python37
-NUMPY_LIBRARY= boost_numpy37
+PYTHON_HEADER_DIRECTORY= /usr/include/python3.6
+LIBRARY_DIRECTORY= /usr/lib/x86_64-linux-gnu 
+PYTHON_LIBRARY= python3.6m 
+NUMPY_LIBRARY= boost_numpy3
+WRAPPER_LIBRARY= boost_python3-py36 
 PYLIBOBJ_PATH= ./pyobj/
 PYLIBOBJ= $(addprefix $(PYLIBOBJ_PATH), $(OBJ_NAME))
 PYLIBOBJ_DIR= $(sort $(dir $(PYLIBOBJ)))
@@ -84,13 +75,11 @@ pyobjdir:
 	@mkdir $(PYLIBOBJ_DIR) 2>/dev/null || echo "" > /dev/null
 
 $(PYLIBNAME): $(PYLIBOBJ)
-#	@$(CC) -Wl,--no-undefined -shared -export-dynamic $(PYLIBOBJ) -L$(LIBRARY_DIRECTORY) -l$(PYTHON_LIBRARY) -l$(WRAPPER_LIBRARY) -l$(NUMPY_LIBRARY) -o $(PYLIBNAME)
-	@$(CC) -Wl, -shared -export-dynamic $(PYLIBOBJ) -L$(BOOST_LIBRARY_DIRECTORY) -l$(WRAPPER_LIBRARY) -l$(NUMPY_LIBRARY) -L$(PYTHON_LIBRARY_DIRECTORY) -l$(PYTHON_LIBRARY) -o $(PYLIBNAME)
+	@$(CC) -Wl,--no-undefined -shared -export-dynamic $(PYLIBOBJ) -L$(LIBRARY_DIRECTORY) -l$(PYTHON_LIBRARY) -l$(WRAPPER_LIBRARY) -l$(NUMPY_LIBRARY) -o $(PYLIBNAME)
 	@printf "\033[2K[ \033[31mcompiling\033[0m ] $< \r"
 
 pyobj/%.o: sources/%.cpp
-#	@$(CC) -D PYTHON_WRAPPER -I$(PYTHON_HEADER_DIRECTORY) -I$(INC_PATH) $(CFLAGS) -fPIC -o $@ -c $<
-	@$(CC) -D PYTHON_WRAPPER -I$(PYTHON_HEADER_DIRECTORY) -I$(BOOST_HEADER_DIRECTORY) -I$(INC_PATH) $(CFLAGS) -fPIC -o $@ -c $<
+	@$(CC) -D PYTHON_WRAPPER -I$(PYTHON_HEADER_DIRECTORY) -I$(INC_PATH) $(CFLAGS) -fPIC -o $@ -c $<
 	@printf " \033[2K[ \033[31mcompiling\033[0m ] $< \r"
 
 .PHONY: cleanpy

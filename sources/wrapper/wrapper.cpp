@@ -39,11 +39,13 @@ BOOST_PYTHON_MODULE(koishi)
     def("Variable", newSimpleVariable, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumber, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpy, return_value_policy<manage_new_object>());
+    def("Variable", newVariableList, return_value_policy<manage_new_object>());
 
     def("Variable", newVariableWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newSimpleVariableWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumberWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpyWithGroup, return_value_policy<manage_new_object>());
+    def("Variable", newVariableListWithGroup, return_value_policy<manage_new_object>());
 
     class_<InitializerWrapper>("Initializer", no_init)
         .def("init", &InitializerWrapper::init)
@@ -57,6 +59,7 @@ BOOST_PYTHON_MODULE(koishi)
     class_<Tensor>("Tensor", init<FLOAT>())
         //.def(init<list&, list&>())
         .def(init<np::ndarray&>())
+        .def(init<boost::python::list&>())
         .def("__str__", &Tensor::__str__)
         .def("eval", &Tensor::evalForPython)
         .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())

@@ -22,6 +22,12 @@ unsigned int Tensor::counter = 0;
         numpyToVector(a)
     ){}
 
+    Tensor::Tensor(list &l)
+    : Tensor(
+        getListShape(l),
+        listToVector<FLOAT>(l)
+    ){}
+
     Tensor::Tensor(std::string group, np::ndarray &a)
     : Tensor(
         getNumpyShape(a),
@@ -29,6 +35,20 @@ unsigned int Tensor::counter = 0;
         NULL
     ){
         std::vector<FLOAT> values = numpyToVector(a);
+        for (unsigned int i = 0; i < len; i++) {
+            ((Constant*)content[i])->setValue(values[i]);
+        }
+        if (len % values.size() != 0)
+            throw TensorException("values of initialization must be a divisor of the len of tensor", this);
+    }
+
+    Tensor::Tensor(std::string group, boost::python::list &list)
+    : Tensor(
+        getListShape(list),
+        group,
+        NULL
+    ){
+        std::vector<FLOAT> values = listToVector<FLOAT>(list);
         for (unsigned int i = 0; i < len; i++) {
             ((Constant*)content[i])->setValue(values[i]);
         }
@@ -53,6 +73,7 @@ unsigned int Tensor::counter = 0;
 
     Tensor::Tensor(std::string group, InitializerWrapper &wrap)
     : Tensor(
+        wrap.initializer->getDims(),
         group,
         wrap.initializer
     ){}
@@ -169,6 +190,16 @@ Tensor::Tensor(Number *value) : Tensor(std::vector<unsigned int>())
 
 Tensor::Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer) : Tensor(dims)
 {
+    if (initializer->getDims().size() > 0) {
+        if (this->dims.size() != initializer->getDims().size()) {
+            throw TensorException("wrong shape of initializer", this);
+        }
+        for (unsigned int i = 0; i < this->dims.size(); i++) {
+            if (this->dims[i] != initializer->getDims()[i]) {
+                throw TensorException("wrong shape of initializer", this);
+            }
+        }
+    }
     for (unsigned int i = 0; i < len; i++) {
         std::string name = this->name + "_" + std::to_string(i);
         setContent(i, new Variable(group, name, initializer));

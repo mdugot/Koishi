@@ -9,11 +9,11 @@ class Feed : public Initializer {
 
 
     public:
-        Feed(std::vector<FLOAT> values);
+        Feed(std::vector<unsigned int> dims, std::vector<FLOAT> values);
         Feed();
         virtual ~Feed();
         void init();
-        void feed(std::vector<FLOAT> values, bool doInit = true);
+        void feed(std::vector<unsigned int> dims, std::vector<FLOAT> values, bool doInit = true);
 
 };
 #endif

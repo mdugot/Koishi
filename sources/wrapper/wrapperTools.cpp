@@ -26,16 +26,17 @@ FeedWrapper::~FeedWrapper() {
 }
 
 void FeedWrapper::feed(list &l) {
-    feeder->feed(listToVector<FLOAT>(l));
+    feeder->feed(getListShape(l), listToVector<FLOAT>(l));
 }
 
 void FeedWrapper::feedSimple(FLOAT value) {
-    feeder->feed({value});
+    feeder->feed({}, {value});
 }
 
 void FeedWrapper::feedNumpy(np::ndarray &a) {
+    std::vector<unsigned int> dims = getNumpyShape(a);
     std::vector<FLOAT> values = numpyToVector(a);
-    feeder->feed(values);
+    feeder->feed(dims, values);
 }
 
 InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max) {
@@ -79,6 +80,36 @@ std::vector<unsigned int> getNumpyShape(np::ndarray &a) {
     return v;
 }
 
+void appendListShape(list &l, std::vector<unsigned int> &v) {
+    v.push_back(len(l));
+
+    unsigned int nextShape = 0;
+    extract<object> objectExtractor(l[0]);
+    object o=objectExtractor();
+    std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
+    if (classname == "list") {
+        list nextList = extract<list>(l[0]);
+        nextShape = len(nextList);
+        appendListShape(nextList, v);
+    }
+    for (unsigned int i = 0; i < len(l); ++i) {
+        extract<object> objectExtractor(l[i]);
+        object o=objectExtractor();
+        std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
+        if (classname == "list" && len(extract<list>(l[i])) != nextShape) {
+            throw TensorException("list has irregular shape");
+        } else if (nextShape != 0) {
+            throw TensorException("list has irregular shape");
+        }
+    }
+}
+
+std::vector<unsigned int> getListShape(list &l) {
+    std::vector<unsigned int> v;
+    appendListShape(l, v);
+    return v;
+}
+
 Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap) {
     return new Tensor(dims, group, wrap);
 }
@@ -109,6 +140,14 @@ Tensor *newVariableNumpyWithGroup(std::string group, np::ndarray &a) {
 
 Tensor *newVariableNumpy(np::ndarray &a) {
     return new Tensor("", a);
+}
+
+Tensor *newVariableListWithGroup(std::string group, list &l) {
+    return new Tensor(group, l);
+}
+
+Tensor *newVariableList(list &l) {
+    return new Tensor("", l);
 }
 
 

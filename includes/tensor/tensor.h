@@ -100,10 +100,12 @@ class Tensor {
         inline std::string __str__() {return toString();}
         inline void printGradient() {OUT << toString(true) << NL;}
         Tensor(boost::python::numpy::ndarray &values);
+        Tensor(boost::python::list &l);
         Tensor(std::string group, InitializerWrapper &wrap);
         Tensor(boost::python::list &dims, std::string group, InitializerWrapper &wrap);
         Tensor(std::string group, FLOAT value);
         Tensor(std::string group, boost::python::numpy::ndarray &a);
+        Tensor(std::string group, boost::python::list &list);
         boost::python::object evalForPython();
         Tensor *transposeFromList(list& permutations);
         Tensor *gatherFromList(list& permutations);

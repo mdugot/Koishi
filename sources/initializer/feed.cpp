@@ -3,19 +3,28 @@
 
 Feed::Feed() : Initializer()
 {
-    feed({0}, false);
+    feed(std::vector<unsigned int>(), {0}, false);
 }
 
-Feed::Feed(std::vector<FLOAT> values) : Initializer()
+Feed::Feed(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Initializer(dims)
 {
-    feed(values, false);
+    feed(dims, values, false);
 }
 
-void Feed::feed(std::vector<FLOAT> values, bool doInit)
+void Feed::feed(std::vector<unsigned int> dims, std::vector<FLOAT> values, bool doInit)
 {
+    if (this->dims.size() > 0) {
+        if (dims.size() != this->dims.size()) {
+            throw NumberException("wrong shape of feed values");
+        }
+        for (unsigned int i = 0; i < this->dims.size(); i++) {
+            if (dims[i] != this->dims[i]) {
+                throw NumberException("wrong shape of feed values");
+            }
+        }
+    }
     if (values.size() == 0) {
         throw NumberException("Feed initializer must contain at least one value");
-        
     }
     if (variables.size() % values.size() != 0)
         throw NumberException("Feed values must be a divisor of the number of variables to initialize");
