@@ -52,7 +52,7 @@ class Data:
 
         self.dataByCourse = self.normalize(self.dataByCourse)
         self.trainData = self.dataByCourse.transpose([1,0])
-        self.dataByStudent = self.dataByStudent.split(0)
+        self.dataByStudent = self.trainData.split(0)
         koishi.initializeAll()
 
         self.houseDataByStudent = {}
@@ -145,5 +145,7 @@ if __name__ == "__main__":
     print(data.dataByStudent[42])
     print(data.dataByStudent.take([42,0,42,1000]))
     print(data.houses["Ravenclaw"])
+    data.histogram("Astronomy", plt)
+    plt.show()
     data.pairPlot()
     plt.show()

@@ -113,6 +113,14 @@ std::vector<unsigned int> getListShape(list &l) {
     return v;
 }
 
+Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap) {
+    return new Tensor(dims, group, wrap);
+}
+
+Tensor *newVariable(list &dims, InitializerWrapper &wrap) {
+    return new Tensor(dims, "", wrap);
+}
+
 Tensor *newSimpleVariable(InitializerWrapper &wrap) {
     return new Tensor("", wrap);
 }

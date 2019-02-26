@@ -41,7 +41,11 @@ void Feed::init() {
     unsigned int i = 0;
     unsigned int size = values.size();
     for (Variable *v : variables) {
-        v->setValue(values[i%size]);
+        if (values.size() > 0) {
+            v->setValue(values[i%size]);
+        } else {
+            v->setValue(0.0);
+        }
         i++;
     }
 }

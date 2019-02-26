@@ -53,6 +53,8 @@ Tensor *newVariableListWithGroup(std::string group, list &l);
 Tensor *newVariableNumber(FLOAT value);
 Tensor *newVariableNumberWithGroup(std::string group, FLOAT value);
 
+Tensor *newVariable(list &dims, InitializerWrapper &wrap);
+Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap);
 Tensor *newSimpleVariable(InitializerWrapper &wrap);
 Tensor *newSimpleVariableWithGroup(std::string group, InitializerWrapper &wrap);
 

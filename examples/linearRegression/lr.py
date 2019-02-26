@@ -7,14 +7,18 @@ class lr:
 
     def __init__(self, filename):
         self.km,self.price = self.readData(filename)
+        self.km = [[km]  for km in self.km]
+        self.price = [[p]  for p in self.price]
         self.initVariable = koishi.fillInitializer(0)
-        self.feedInputs = koishi.feedInitializer()
-        self.feedOutputs = koishi.feedInitializer()
+        self.feedInputs = koishi.feedInitializer([len(self.km),1])
+        self.feedOutputs = koishi.feedInitializer([len(self.km),1])
 
-        self.inputs = koishi.Variable([len(self.km),1], "inputs", self.feedInputs)
-        self.outputs = koishi.Variable([len(self.km),1], "outputs", self.feedOutputs)
+        self.inputs = koishi.Variable("inputs", self.feedInputs)
+        self.outputs = koishi.Variable("outputs", self.feedOutputs)
         self.theta0 = koishi.Variable("variable", self.initVariable)
         self.theta1 = koishi.Variable([1,1], "variable", self.initVariable)
+        self.feedInputs.feed(self.km)
+        self.feedOutputs.feed(self.price)
         self.m = koishi.Tensor(len(self.km))
         self.estimation = self.inputs.matmul(self.theta1).add(self.theta0)
         self.cost = self.estimation.substract(self.outputs).pow(2).sum().divide(self.m.multiply(2))
