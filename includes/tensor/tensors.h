@@ -84,6 +84,9 @@ class Tensors {
         inline Tensors* sigmoid() const {
             auto f = [](Tensor const*t){return t->sigmoid();};
             return forEach(f);}
+        inline Tensors* log() const {
+            auto f = [](Tensor const*t){return t->log();};
+            return forEach(f);}
         inline Tensors* mean() const {
             auto f = [](Tensor const*t){return t->mean();};
             return forEach(f);}

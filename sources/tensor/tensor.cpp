@@ -5,6 +5,7 @@
 #include "operation/addition.h"
 #include "operation/inverse.h"
 #include "operation/sigmoid.h"
+#include "operation/log.h"
 #include "operation/multiplication.h"
 #include "operation/sum.h"
 #include "operation/pow.h"
@@ -497,6 +498,17 @@ Tensor *Tensor::sigmoid() const {
     }
     c+=1;
     result->name = "sigmoid" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::log() const {
+    static unsigned int c = 0;
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Log(content[i]));
+    }
+    c+=1;
+    result->name = "log" + std::to_string(c);
     return result;
 }
 

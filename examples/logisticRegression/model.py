@@ -7,11 +7,11 @@ class Model:
     def __init__(self, data):
         self.data = data
         self.initVariable = koishi.fillInitializer(0)
-        self.feedInputs = koishi.feedInitializer()
-        self.feedLabels = koishi.feedInitializer()
+        self.feedInputs = koishi.feedInitializer([data.size(), data.numberFeatures()])
+        self.feedLabels = koishi.feedInitializer([data.size(),1])
 
-        self.inputs = koishi.Variable([data.size(), data.numberFeatures()], "inputs", self.feedInputs)
-        self.labels = koishi.Variable([data.size(),1], "labels", self.feedLabels)
+        self.inputs = koishi.Variable("inputs", self.feedInputs)
+        self.labels = koishi.Variable("labels", self.feedLabels)
 
         self.theta = koishi.Variable([1,data.numberFeatures()], "variable", self.initVariable)
         self.m = koishi.Tensor(data.size())
@@ -27,8 +27,8 @@ class Model:
 #        return self.unnormalize(self.prediction.eval(), self.priceMin, self.priceRange)
 
     def train(self, epoch, learningRate, optim = None):
-        self.feedInputs.feed(list(np.array(D.trainData.eval()).reshape([-1])))
-        self.feedOutputs.feed(list(np.array(self.data.labels.eval()).reshape([-1])))
+        self.feedInputs.feed(np.array(D.trainData.eval()))
+        self.feedOutputs.feed(np.array(self.data.labels.eval()))
         if optim != None:
             print("Train with : " + optim)
         for i in tqdm(range(epoch)):

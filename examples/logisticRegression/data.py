@@ -126,9 +126,7 @@ class Data:
         houses = rawData[:][houseColumn]
         data = self.getFeatures(rawData)
         means = np.nanmean(data, axis=0)
-        print(means)
         idxs = np.where(np.isnan(data))
-        print(idxs)
         data[idxs] = np.take(means, idxs[1])
         return data, houses
 
