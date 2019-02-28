@@ -24,6 +24,8 @@ class Data:
 
         data, houses = self.readData(filename)
 
+        self.housesNames = houseNames
+        self.numberStudent = len(data)
         self.dataByStudent = koishi.Tensor(data)
         self.dataByCourse = self.dataByStudent.transpose([1,0])
         self.houses = {}
@@ -57,9 +59,12 @@ class Data:
 
         self.houseDataByStudent = {}
         self.houseDataByCourse = {}
+        self.labels = {}
         for name in houseNames:
             self.houseDataByStudent[name] = self.dataByStudent.take(self.houses[name]).merge([len(self.houses[name])])
             self.houseDataByCourse[name] = self.houseDataByStudent[name].transpose([1,0])
+            self.labels[name] = np.zeros([self.numberStudent, 1])
+            self.labels[name][self.houses[name],:] = 1.
 
     def normalize(self, data):
         shape = [int(data.shape().eval()[0])]
@@ -130,8 +135,15 @@ class Data:
         data[idxs] = np.take(means, idxs[1])
         return data, houses
 
-    def size(self):
+    def sizeTrainData(self):
         return len(self.trainData.eval())
+
+    def getTrainData(self):
+        return self.trainData.eval()
+
+    def getLabels(self, house):
+        return self.labels[house]
+
 
     def numberFeatures(self):
         return len(self.trainData.eval()[0])

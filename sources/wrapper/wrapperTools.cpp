@@ -65,6 +65,7 @@ object Tensor::evalForPython() {
 }
 
 std::vector<FLOAT> numpyToVector(np::ndarray &a) {
+    a = a.astype(np::dtype::get_builtin<float>());
     list l(a.reshape(make_tuple(-1)));
     std::vector<FLOAT> v;
     for (unsigned int i = 0; i < len(l); ++i) {
@@ -74,6 +75,7 @@ std::vector<FLOAT> numpyToVector(np::ndarray &a) {
 }
 
 std::vector<unsigned int> getNumpyShape(np::ndarray &a) {
+    a = a.astype(np::dtype::get_builtin<float>());
     Py_intptr_t const * shape = a.get_shape();
     int ndim = a.get_nd();
     std::vector<unsigned int> v;
