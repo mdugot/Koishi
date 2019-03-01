@@ -54,6 +54,10 @@ FeedWrapper *getFeedInitializerFromList(list &l) {
     return new FeedWrapper(new Feed(listToVector<unsigned int>(l)));
 }
 
+void saveListGroups(std::string filename, list &l) {
+    Variable::saveGroups(filename, listToVector<std::string>(l));
+}
+
 object Tensor::evalForPython() {
     if (dims.size() == 0)
         return object(content[0]->eval());

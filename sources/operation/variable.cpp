@@ -26,6 +26,21 @@ void Variable::save(std::string filename, std::string group) {
     file.close();
 }
 
+void Variable::saveGroups(std::string filename, std::vector<std::string> groups) {
+    std::ofstream file;
+    file.open(filename);
+    if (!file.is_open())
+        throw NumberException("can not open file '" + filename + "'");
+    for (unsigned int i = 0; i < groups.size(); i++) {
+        std::string group = groups[i];
+        auto bound = variablesByGroup.equal_range(group);
+        for (auto it = bound.first; it!=bound.second; ++it) {
+            file << it->second->getId() + "," + std::to_string(it->second->getValue()) << NL;
+        }
+    }
+    file.close();
+}
+
 void Variable::load(std::string filename) {
     std::ifstream file;
     file.open(filename);
@@ -55,7 +70,7 @@ Variable::Variable(std::string group, std::string name, Initializer *initializer
 
 Variable::Variable(std::string group, std::string name, FLOAT v) : Constant(v), name(name), group(group), momentum(0), squaredGradientAverage(0) {
     initializer = NULL;
-    std::string id = group + "/" + name;
+    std::string id = group + "-" + std::to_string(variablesByGroup.count(group));
     this->id = id;
 //    DEBUG << "new variable : " << id << NL;
     if (variablesById.count(id) > 0) {

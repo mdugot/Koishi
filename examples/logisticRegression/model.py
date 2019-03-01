@@ -1,77 +1,113 @@
 import koishi
 import numpy as np
+import os
 from tqdm import tqdm
+from data import houseNames
 
 class Model:
 
-    def __init__(self, data, house):
+    def __init__(self, house, numberFeatures, batchSize):
         self.house = house
-        self.data = data
+        self.batchSize = batchSize
         self.initVariable = koishi.uniformInitializer(-0.1,0.1)
-        self.feedInputs = koishi.feedInitializer([data.sizeTrainData(), data.numberFeatures()])
-        self.feedLabels = koishi.feedInitializer([data.sizeTrainData(),1])
-        self.feedTest = koishi.feedInitializer([1, data.numberFeatures()])
+        self.feedInputs = koishi.feedInitializer([1, numberFeatures])
+        self.feedBatch = koishi.feedInitializer([batchSize, numberFeatures])
+        self.feedLabels = koishi.feedInitializer([batchSize,1])
 
-        self.inputs = koishi.Variable("inputs", self.feedInputs)
-        self.test = koishi.Variable("test", self.feedTest)
-        self.labels = koishi.Variable("labels", self.feedLabels)
+        self.pp_feedMean = koishi.feedInitializer([numberFeatures])
+        self.pp_feedRange = koishi.feedInitializer([numberFeatures])
+        self.pp_mean = koishi.Variable(self.getName("preprocess"), self.pp_feedMean)
+        self.pp_range = koishi.Variable(self.getName("preprocess"), self.pp_feedRange)
 
-        self.theta = koishi.Variable([1,data.numberFeatures()], "variable", self.initVariable)
-        self.m = koishi.Tensor(data.sizeTrainData())
+        self.inputs = koishi.Variable(self.getName("inputs"), self.feedInputs)
+        self.batch = koishi.Variable(self.getName("batch"), self.feedBatch)
+        self.labels = koishi.Variable(self.getName("labels"), self.feedLabels)
 
-        self.estimation = self.inputs.matmul(self.theta.transpose([1,0])).sigmoid()
-        self.prediction = self.test.matmul(self.theta.transpose([1,0])).sigmoid()
+        self.ninputs = self.inputs.transpose([1,0]).split(0).substract(
+                            self.pp_mean.split(0)).divide(
+                                self.pp_range.split(0)).merge(
+                                    [numberFeatures]).transpose([1,0])
 
-        self.positives = self.estimation.log().multiply(self.labels)
-        self.negatives = self.estimation.negative().add(1).log().multiply(self.labels.negative().add(1))
+        self.nbatch = self.batch.transpose([1,0]).split(0).substract(
+                            self.pp_mean.split(0)).divide(
+                                self.pp_range.split(0)).merge(
+                                    [numberFeatures]).transpose([1,0])
+
+        self.theta = koishi.Variable([1,numberFeatures], self.getName("variable"), self.initVariable)
+        self.m = koishi.Tensor(batchSize)
+
+        self.estimation = self.ninputs.matmul(self.theta.transpose([1,0])).sigmoid()
+        self.outputs = self.nbatch.matmul(self.theta.transpose([1,0])).sigmoid()
+
+        self.positives = self.outputs.log().multiply(self.labels)
+        self.negatives = self.outputs.negative().add(1).log().multiply(self.labels.negative().add(1))
         self.cost = self.m.inverse().negative().multiply(self.positives.add(self.negatives).sum())
         koishi.initializeAll()
 
-    def train(self, epoch, learningRate, optim = None):
-        self.feedInputs.feed(np.array(self.data.getTrainData()))
-        self.feedLabels.feed(np.array(self.data.getLabels(self.house)))
+    def getName(self, name):
+        return "%s/%s"%(self.house,name)
+
+    def optim(self, learningRate, optim):
+        if optim == "momentum":
+            koishi.momentumOptim(self.getName("variable"), learningRate, 0.9)
+        elif optim == "rmsprop":
+            koishi.RMSPropOptim(self.getName("variable"), learningRate, 0.9)
+        elif optim == "adam":
+            koishi.adamOptim(self.getName("variable"), learningRate, 0.9, 0.9)
+        else:
+            koishi.gradientDescentOptim(self.getName("variable"), learningRate)
+
+    def train(self, trainset, epoch, learningRate, optim = None, stochastic=False):
+        self.pp_feedMean.feed(trainset.mean.eval())
+        self.pp_feedRange.feed(trainset.range.eval())
         print("Train with : " + (optim if optim is not None else "gradient descent"))
         for i in tqdm(range(epoch)):
-            self.cost.backpropagation()
-            if optim == "momentum":
-                koishi.momentumOptim("variable", learningRate, 0.9)
-            elif optim == "rmsprop":
-                koishi.RMSPropOptim("variable", learningRate, 0.9)
-            elif optim == "adam":
-                koishi.adamOptim("variable", learningRate, 0.9, 0.9)
-            else:
-                koishi.gradientDescentOptim("variable", learningRate)
+            idx = 0
+            features,labels = trainset.getBatch(self.house, idx, self.batchSize)
+            while features is not None:
+                self.feedBatch.feed(features)
+                self.feedLabels.feed(labels)
+                self.cost.backpropagation()
+                if stochastic is True:
+                    self.optim(learningRate, optim)
+                features,labels = trainset.getBatch(self.house, idx, self.batchSize)
+                idx += 1
+            if stochastic is False:
+                self.optim(learningRate, optim)
 
     def predict(self, features):
         features = [features]
-        self.feedTest.feed(features)
-        return self.prediction.eval()[0][0]
+        self.feedInputs.feed(features)
+        return self.estimation.eval()[0][0]
 
-    def save(self, filename):
-        koishi.save(filename, "variable")
+    def save(self):
+        path = "./saves/"
+        if not os.path.exists(path):
+            os.makedirs(path)
+        koishi.save(os.path.join(path, self.house), [self.getName("preprocess"), self.getName("variable")])
 
-    def load(self, filename):
-        koishi.load(filename)
+    def load(self):
+        path = os.path.join("./saves/", self.house)
+        if not os.path.exists(path):
+            print("save not found")
+        koishi.load(path)
 
 class OneVsAll:
-    def __init__(self, data):
+    def __init__(self, numberFeatures, batchSize):
         self.models = {}
-        self.data = data
-        for name in data.houses.keys():
-            self.models[name] = Model(data, name)
+        for name in houseNames:
+            self.models[name] = Model(name, numberFeatures, batchSize)
 
-    def train(self):
+    def train(self, dataset):
         for name,model in self.models.items():
             print("train " + name)
-            print(model.cost.eval())
-            model.train(200, 0.05, optim="adam")
-            print(model.cost.eval(), end="\n\n")
+            model.train(dataset, 20, 0.1, optim="adam", stochastic=False)
 
-    def evaluate(self):
+    def evaluate(self, dataset):
         success = 0
         idx = 0
         print("Evaluate :")
-        for features in tqdm(self.data.trainData.eval()):
+        for features in tqdm(dataset.getData()):
             result = "unknown"
             prob = 0
             for house,model in self.models.items():
@@ -79,17 +115,17 @@ class OneVsAll:
                 if p > prob:
                     result = house
                     prob = p
-            if self.data.labels[result][idx] == 1.:
+            if result in dataset.labels.keys() and dataset.labels[result][idx] == 1.:
                 success += 1
             idx += 1
-        print("%d / %d"%(success,len(self.data.trainData.eval())))
+        print("%d / %d"%(success,len(dataset.getData())))
 
-    def resultToCsv(self, filename):
+    def resultToCsv(self, filename, dataset):
         f = open(filename, "w")
         idx = 0
         f.write("Index,Hogwarts House\n")
         print("Save results to '%s' :" % filename)
-        for features in tqdm(self.data.trainData.eval()):
+        for features in tqdm(dataset.getData()):
             result = "unknown"
             prob = 0
             for house,model in self.models.items():
@@ -101,10 +137,21 @@ class OneVsAll:
             idx += 1
         f.close()
 
+    def save(self):
+        for name,model in self.models.items():
+            model.save()
+
+    def load(self):
+        for name,model in self.models.items():
+            model.load()
+
 if __name__ == "__main__":
     from data import Data
-    D = Data("dataset_train.csv")
-    predictor = OneVsAll(D)
-    predictor.train()
-    predictor.evaluate()
-    predictor.resultToCsv("/tmp/result.csv")
+    trainset = Data("dataset_train.csv", validation=False)
+    testset = Data("dataset_train.csv", validation=True)
+    assert trainset.numberFeatures() == testset.numberFeatures()
+    model = OneVsAll(trainset.numberFeatures(), 400)
+    model.train(trainset)
+    model.evaluate(trainset)
+    model.evaluate(testset)
+    model.save()

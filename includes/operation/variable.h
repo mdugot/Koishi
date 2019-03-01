@@ -18,6 +18,7 @@ class Variable : public Constant {
         static std::map<std::string, Variable*> variablesById;
 
         static void save(std::string filename, std::string group);
+        static void saveGroups(std::string filename, std::vector<std::string> groups);
         static void saveAll(std::string filename);
         static void load(std::string filename);
 

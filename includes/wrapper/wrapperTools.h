@@ -9,6 +9,7 @@
 #include "initializer/feed.h"
 #include "initializer/fill.h"
 #include "operation/numberException.h"
+#include "operation/variable.h"
 
 class TensorException;
 class Tensor;
@@ -57,6 +58,8 @@ Tensor *newVariable(list &dims, InitializerWrapper &wrap);
 Tensor *newVariableWithGroup(list &dims, std::string group, InitializerWrapper &wrap);
 Tensor *newSimpleVariable(InitializerWrapper &wrap);
 Tensor *newSimpleVariableWithGroup(std::string group, InitializerWrapper &wrap);
+
+void saveListGroups(std::string filename, list &l);
 
 template<class T>
 void appendList(list &l, std::vector<T> &v) {

@@ -16,6 +16,7 @@ BOOST_PYTHON_MODULE(koishi)
 
     def("initializeAll", &Initializer::initializeAll);
     def("save", &Variable::save);
+    def("save", saveListGroups);
     def("saveAll", &Variable::saveAll);
     def("load", &Variable::load);
 

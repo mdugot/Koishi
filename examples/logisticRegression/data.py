@@ -4,6 +4,7 @@ from tqdm import tqdm
 import numpy as np
 if np.__version__ >= '1.16':
     import numpy.lib.recfunctions as rf
+np.warnings.filterwarnings('ignore')
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -14,15 +15,32 @@ houseColumn = "Hogwarts_House"
 houseNames = ['Ravenclaw', 'Hufflepuff', 'Gryffindor', 'Slytherin']
 houseColor = {
     "Ravenclaw": 'blue',
-    "Hufflepuff": 'yellow',
+    "Hufflepuff": 'gold',
     "Gryffindor": 'red',
     "Slytherin": 'green'}
 
-class Data:
 
-    def __init__(self, filename):
+
+class Dataset:
+
+    def __init__(self, filename, validation = None, validationPercent = 0.1, shuffle=True):
 
         data, houses = self.readData(filename)
+        np.random.seed(42)
+        assert len(data) == len(houses)
+        if shuffle is True:
+            p = np.random.permutation(len(data))
+            data = data[p]
+            houses = houses[p]
+        if validation is not None:
+            limit = int(len(data) * validationPercent)
+            if validation is False:
+                data = data[:-limit]
+                houses = houses[:-limit]
+            else:
+                data = data[-limit:]
+                houses = houses[-limit:]
+
 
         self.housesNames = houseNames
         self.numberStudent = len(data)
@@ -52,29 +70,27 @@ class Data:
             self.description["75%"].append(self.dataByCourse[idx].percentile(75))
             self.description["Max"].append(self.dataByCourse[idx].max())
 
-        self.dataByCourse = self.normalize(self.dataByCourse)
-        self.trainData = self.dataByCourse.transpose([1,0])
-        self.dataByStudent = self.trainData.split(0)
+        self.data = self.dataByCourse.transpose([1,0])
+        splitData = self.dataByCourse.split(0)
+        self.mean = splitData.mean().merge([self.numberFeatures()])
+        self.range = splitData.range().merge([self.numberFeatures()])
+        self.dataByStudent = self.data.split(0)
         koishi.initializeAll()
 
         self.houseDataByStudent = {}
         self.houseDataByCourse = {}
         self.labels = {}
         for name in houseNames:
-            self.houseDataByStudent[name] = self.dataByStudent.take(self.houses[name]).merge([len(self.houses[name])])
-            self.houseDataByCourse[name] = self.houseDataByStudent[name].transpose([1,0])
-            self.labels[name] = np.zeros([self.numberStudent, 1])
-            self.labels[name][self.houses[name],:] = 1.
+            if len(self.houses[name]) > 0:
+                self.houseDataByStudent[name] = self.dataByStudent.take(self.houses[name]).merge([len(self.houses[name])])
+                self.houseDataByCourse[name] = self.houseDataByStudent[name].transpose([1,0])
+                self.labels[name] = np.zeros([self.numberStudent, 1])
+                self.labels[name][self.houses[name],:] = 1.
 
-    def normalize(self, data):
-        shape = [int(data.shape().eval()[0])]
-        splitData = data.split(0)
-        normalizeData = splitData.substract(splitData.mean()).divide(splitData.range())
-        return normalizeData.merge(shape)
-
-    def histogram(self, course, ax, sample=None, binSize=0.01):
+    def histogram(self, course, ax, sample=None, nbins=100):
         idx = featureNames.index(course)
-        bins = np.arange(-1, 1+binSize, binSize)
+        data = np.array(self.dataByCourse[idx].eval())
+        bins = np.arange(data.min(), data.max(), (data.max()-data.min())/nbins)
         for name in houseNames:
             data = np.array(self.houseDataByCourse[name][idx].eval())
             if sample is not None:
@@ -98,13 +114,19 @@ class Data:
         L = len(featureNames)
         for i in tqdm(range(L)):
             for j in range(L):
-                ax = plt.subplot(L, L, i*L+j+1)
+                ax = plt.subplot(L+1, L+1, (i+1)*(L+1)+j+2)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 if i == j:
-                    self.histogram(featureNames[i], ax, sample=50, binSize=0.1)
+                    self.histogram(featureNames[i], ax, sample=50, nbins=20)
                 else:
                     self.scatterPlot(featureNames[i], featureNames[j], ax, sample=50, size=1)
+                if i == 0 and j == 0:
+                    ax.set_title(shortnames[j], loc="right", rotation=-45, pad=5, verticalalignment="bottom")
+                elif i == 0:
+                    ax.set_title(shortnames[j], rotation="vertical", pad=5, verticalalignment="bottom")
+                elif j == 0:
+                    ax.set_title(shortnames[i], pad=-15, loc="left", horizontalalignment="right")
 
     def describe(self):
         padding = 12
@@ -135,18 +157,26 @@ class Data:
         data[idxs] = np.take(means, idxs[1])
         return data, houses
 
-    def sizeTrainData(self):
-        return len(self.trainData.eval())
+    def sizeData(self):
+        return len(self.data.eval())
 
-    def getTrainData(self):
-        return self.trainData.eval()
+    def getData(self):
+        return self.data.eval()
+
+    def getBatch(self, house, idx, batchSize):
+        data = self.getData()
+        labels = self.getLabels(house)
+        assert len(labels) == len(data)
+        if (idx+1) * batchSize <= len(data):
+            return data[idx*batchSize:(idx+1)*batchSize], labels[idx*batchSize:(idx+1)*batchSize]
+        else:
+            return None, None
 
     def getLabels(self, house):
         return self.labels[house]
 
-
     def numberFeatures(self):
-        return len(self.trainData.eval()[0])
+        return len(self.data.eval()[0])
 
 
 if __name__ == "__main__":
