@@ -12,8 +12,6 @@
 void maintest();
 
 int main(int argc, char **argv) {
-	(void)argc;
-	(void)argv;
     try {
         maintest();
         return 0;
@@ -24,6 +22,7 @@ int main(int argc, char **argv) {
 }
 
 void maintest() {
-	DEBUG << "testing koishi..." << NL << NL;
+    Tensor t(42.0);
+    DEBUG << t << NL << NL;
 
 }
