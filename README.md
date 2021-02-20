@@ -4,21 +4,21 @@ Koishi is a computational graph library for machine learning. It is written in C
 
 # Requirements
 
-### C++11 Compiler
+* ### C++11 Compiler
 Source code is written in C++11.
 
-### CMake
+ * ### CMake
 **tested with version 3.19** <br/>
 [CMake](https://cmake.org/) is used to make the library.
 
-### Python3
+ * ### Python3
 **tested with version 3.9** <br/>
 On compiled, the library will be wrapped into a python3 module.
 
-### Numpy
+ * ### Numpy
 **tested with version 1.18** <br/>
 Koishi is compatible with [Numpy](https://numpy.org/).
 
-### Boost
+ * ### Boost
 **tested with version 1.75** <br/>
 [Boost](https://www.boost.org/) is used to handle the compatibility between c++ code and Python/numpy.
