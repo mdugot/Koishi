@@ -13,7 +13,7 @@ Source code is written in C++11.
 
  * ### Python3
 *tested with version 3.9* <br/>
-On compiled, the library will be wrapped into a python3 module.
+Once compiled, the library will be wrapped into a python3 module.
 
  * ### Numpy
 *tested with version 1.18* <br/>
