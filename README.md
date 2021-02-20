@@ -18,7 +18,7 @@ On compiled, the library will be wrapped into a python3 module.
  * ### Numpy
 *tested with version 1.18* <br/>
 Koishi is compatible with [Numpy](https://numpy.org/).
-If missing, numpy will be automatically installed furing the installation.
+If missing, numpy will be automatically installed during the installation.
 
  * ### Boost
 *tested with version 1.75* <br/>
