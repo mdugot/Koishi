@@ -4,7 +4,7 @@
 
 char const* greet()
 {
-   return "KOISHI (a math library for machine-learning)";
+   return "KOISHI (computional graph for machine learning library)";
 }
 
 BOOST_PYTHON_MODULE(koishi)

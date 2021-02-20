@@ -4,12 +4,18 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Boost 1.75 REQUIRED COMPONENTS python numpy)
+find_package(Python3 3.8 REQUIRED COMPONENTS Development)
 
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -D PYTHON_WRAPPER")
+
+include_directories(${Boost_INCLUDE_DIRS}) 
+message(STATUS ${Python3_INCLUDE_DIRS})
+include_directories(${Python3_INCLUDE_DIRS}) 
 include_directories(
 ${PROJECT_SOURCE_DIR}/includes
 )
 
-add_library(klib SHARED
+add_library(koishi SHARED
 sources/initializer/feed.cpp
 sources/initializer/fill.cpp
 sources/initializer/initializer.cpp
@@ -37,5 +43,6 @@ sources/wrapper/wrapper.cpp
 sources/wrapper/wrapperTools.cpp
 )
 
-add_executable(Test sources/main.cpp)
-target_link_libraries(Test klib)
+set_target_properties(koishi PROPERTIES PREFIX "")
+target_link_libraries(koishi ${Python3_LIBRARY_RELEASE})
+target_link_libraries(koishi ${Boost_LIBRARIES})
