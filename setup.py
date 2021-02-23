@@ -56,6 +56,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=INSTALL_REQS,
     url="https://github.com/mdugot/Koishi.git",
+    package_dir={'':'package'},
     packages=['koishi'],
     ext_modules=[CMakeExtension('koishi/koishi')],
     cmdclass={
