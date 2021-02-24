@@ -5,6 +5,7 @@
 #include "operation/addition.h"
 #include "operation/inverse.h"
 #include "operation/sigmoid.h"
+#include "operation/exp.h"
 #include "operation/log.h"
 #include "operation/multiplication.h"
 #include "operation/sum.h"
@@ -406,18 +407,13 @@ bool Tensor::sameShape(const Tensor &tensor) const {
 
 Tensor *Tensor::add(const Tensor &tensor) const {
     static unsigned int c = 0;
-    if (sameShape(tensor) == false && tensor.dims.size() > 0)
-        throw TensorException("can not add tensor of different shapes", this, &tensor);
+    if (sameShape(tensor) == false && tensor.dims.size() > 0) {
+        checkElementWiseOp(tensor.dims);
+    }
     c+=1;
     Tensor *result = new Tensor(dims);
-    if (tensor.dims.size() == 0) {
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Addition(content[i], tensor.content[0]));
-        }
-    } else {
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Addition(content[i], tensor.content[i]));
-        }
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Addition(content[i], tensor.content[i % tensor.len]));
     }
     result->name = "add" + std::to_string(c);
     return result;
@@ -425,25 +421,14 @@ Tensor *Tensor::add(const Tensor &tensor) const {
 
 Tensor *Tensor::pow(const Tensor &tensor) const {
     static unsigned int c = 0;
-    if (sameShape(tensor) == false && tensor.dims.size() > 0 && dims.size() > 0)
-        throw TensorException("can not pow tensor of different shapes", this, &tensor);
+    if (sameShape(tensor) == false && tensor.dims.size() > 0) {
+        checkElementWiseOp(tensor.dims);
+    }
     c+=1;
-    Tensor *result;
-    if (dims.size() == 0) {
-        result = new Tensor(tensor.dims);
-        for (unsigned int i = 0; i < tensor.len; i++) {
-            result->setContent(i, new Pow(content[0], tensor.content[i]));
-        }
-    } else if (tensor.dims.size() == 0) {
-        result = new Tensor(dims);
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Pow(content[i], tensor.content[0]));
-        }
-    } else {
-        result = new Tensor(dims);
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Pow(content[i], tensor.content[i]));
-        }
+    Tensor *result = new Tensor(dims);
+    result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Pow(content[i], tensor.content[i % tensor.len]));
     }
     result->name = "pow" + std::to_string(c);
     return result;
@@ -451,18 +436,13 @@ Tensor *Tensor::pow(const Tensor &tensor) const {
 
 Tensor *Tensor::multiply(const Tensor &tensor) const {
     static unsigned int c = 0;
-    if (sameShape(tensor) == false && tensor.dims.size() > 0)
-        throw TensorException("can not multiply tensor of different shapes", this, &tensor);
+    if (sameShape(tensor) == false && tensor.dims.size() > 0) {
+        checkElementWiseOp(tensor.dims);
+    }
     c+=1;
     Tensor *result = new Tensor(dims);
-    if (tensor.dims.size() == 0) {
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Multiplication(content[i], tensor.content[0]));
-        }
-    } else {
-        for (unsigned int i = 0; i < len; i++) {
-            result->setContent(i, new Multiplication(content[i], tensor.content[i]));
-        }
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Multiplication(content[i], tensor.content[i % tensor.len]));
     }
     result->name = "multiply" + std::to_string(c);
     return result;
@@ -498,6 +478,17 @@ Tensor *Tensor::sigmoid() const {
     }
     c+=1;
     result->name = "sigmoid" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::exp() const {
+    static unsigned int c = 0;
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Exp(content[i]));
+    }
+    c+=1;
+    result->name = "exp" + std::to_string(c);
     return result;
 }
 
@@ -725,4 +716,15 @@ void Tensor::gradientChecking(std::string group) {
     if (dims.size() > 0)
         throw TensorException("gradient checking can only be done with a scallar", this);
     asNumber().checkAllGradient(group);
+}
+
+void Tensor::checkElementWiseOp(const std::vector<unsigned int> op_dims) const {
+    if (op_dims.size() == 0) return;
+    for (int i = 1; i <= op_dims.size(); i++) {
+        int op_idx = op_dims.size() - i;
+        int self_idx = dims.size() - i;
+        if (self_idx < 0 || dims[self_idx] != op_dims[op_idx]) {
+            throw TensorException("size for element wise operation doesn't match", this);
+        }
+    }
 }

@@ -23,7 +23,9 @@ class Tensor {
         Number** content;
 
         std::string name;
+
         Tensor getTmp(unsigned int idx) const;
+        void checkElementWiseOp(const std::vector<unsigned int> op_dims) const;
 
 
     public:
@@ -68,6 +70,7 @@ class Tensor {
         Tensor *inverse() const;
         Tensor *negative() const;
         Tensor *sigmoid() const;
+        Tensor *exp() const;
         Tensor *log() const;
         Tensor *sum() const;
         Tensor *count() const;

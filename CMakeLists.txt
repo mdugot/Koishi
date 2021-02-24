@@ -33,6 +33,7 @@ sources/operation/percentile.cpp
 sources/operation/pow.cpp
 sources/operation/reduction.cpp
 sources/operation/sigmoid.cpp
+sources/operation/exp.cpp
 sources/operation/sum.cpp
 sources/operation/transformation.cpp
 sources/operation/variable.cpp

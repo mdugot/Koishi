@@ -14,6 +14,8 @@ init = koishi.uniformInitializer(-0.1,0.1)
 inputs = koishi.Variable('inputs', feed_batch)
 
 w1 = koishi.Variable([13, 8], 'w1', init)
-w2 = koishi.Variable([8, 3], 'w1', init)
+w2 = koishi.Variable([8, 3], 'w2', init)
+
+forward = inputs.matmul(w1).matmul(w2)
 
 feed_batch.feed(train_data)
