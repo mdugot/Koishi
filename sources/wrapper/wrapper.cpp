@@ -58,6 +58,9 @@ BOOST_PYTHON_MODULE(koishi)
         .def("feed", &FeedWrapper::feedNumpy)
     ;
 
+    Tensor *(Tensor::*mean_1)(unsigned int) const = &Tensor::mean;
+    Tensor *(Tensor::*mean_2)() const = &Tensor::mean;
+
     class_<Tensor>("Tensor", init<FLOAT>())
         //.def(init<list&, list&>())
         .def(init<np::ndarray&>())
@@ -66,7 +69,8 @@ BOOST_PYTHON_MODULE(koishi)
         .def("eval", &Tensor::evalForPython)
         .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())
         .def("count", &Tensor::count, return_value_policy<manage_new_object>())
-        .def("mean", &Tensor::mean, return_value_policy<manage_new_object>())
+        .def("mean", mean_1, return_value_policy<manage_new_object>())
+        .def("mean", mean_2, return_value_policy<manage_new_object>())
         .def("std", &Tensor::std, return_value_policy<manage_new_object>())
         .def("percentile", &Tensor::percentile, return_value_policy<manage_new_object>())
         .def("min", &Tensor::min, return_value_policy<manage_new_object>())

@@ -25,6 +25,7 @@ class Tensor {
 
         Tensor getTmp(unsigned int idx) const;
         void checkElementWiseOp(const std::vector<unsigned int> op_dims) const;
+        Tensor *foreach(unsigned int from_dim, Tensor *(Tensor::*op)() const) const;
 
 
     public:
@@ -38,6 +39,7 @@ class Tensor {
         Tensor(const Tensor *origin, unsigned int idx);
         Tensor(const Tensor *origin);
         Tensor(const Tensor *origin, std::vector<unsigned int> idx);
+        Tensor(const std::vector<Tensor*> tensors);
         ~Tensor();
 
         inline Tensor* clone() {return new Tensor(this);}
@@ -91,6 +93,7 @@ class Tensor {
         inline Tensor *min() const {return percentile(0);}
         inline Tensor *range() const {return max()->substract(*min());}
         inline Tensor *mean() const {return sum()->divide(*count());}
+        inline Tensor *mean(unsigned int dim) const {return foreach(dim, &Tensor::mean);}
 
         void gradientReinit();
         void gradientUpdate();

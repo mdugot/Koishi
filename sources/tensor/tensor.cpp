@@ -126,6 +126,31 @@ Tensor::Tensor(const Tensor *origin) : dims(origin->dims)
     }
 }
 
+Tensor::Tensor(const std::vector<Tensor*> tensors) : dims()
+{
+    counter += 1;
+    name = "merge(";
+    dims.push_back(tensors.size());
+    if (tensors[0]->dims.size() > 0) {
+        dims.insert(dims.end(), tensors[0]->dims.begin(), tensors[0]->dims.end());
+    }
+
+    len = calculateLen();
+    this->content = new Number*[len];
+    int c_i = 0;
+    for (int idx = 0; idx < tensors.size(); idx++) {
+        if (tensors[idx]->dims != tensors[0]->dims)
+            throw TensorException("try to merge tensors of different shape", this);
+        name += tensors[idx]->name + ",";
+        for (unsigned int i = 0; i < tensors[idx]->len; i++) {
+            content[c_i] = NULL;
+            setContent(c_i, tensors[idx]->content[i]);
+            c_i += 1;
+        }
+    }
+    name += ")";
+}
+
 Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origin->dims)
 {
     counter += 1;
@@ -151,7 +176,6 @@ Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origi
         setContent(i, origin->content[start+i]);
     }
 }
-
 
 Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tensor(dims)
 {
@@ -263,7 +287,6 @@ Tensor *Tensor::gather(std::vector<unsigned int> idx) const {
     }
     return new Tensor(this, idx);
 }
-
 
 Tensor Tensor::getTmp(unsigned int idx) const {
     if (dims.size() == 0)
@@ -706,3 +729,15 @@ void Tensor::checkElementWiseOp(const std::vector<unsigned int> op_dims) const {
         }
     }
 }
+
+Tensor *Tensor::foreach(unsigned int from_dim, Tensor *(Tensor::*op)() const) const {
+     if (from_dim == 0) {
+        return (*this.*op)();
+     }
+     std::vector<Tensor*> tensors;
+     for (int idx = 0; idx < dims[0]; idx++) {
+        tensors.push_back(get(idx)->foreach(from_dim -1, op));
+     }
+     return new Tensor(tensors);
+}
+
