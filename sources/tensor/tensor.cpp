@@ -1,5 +1,4 @@
 #include "tensor/tensor.h"
-#include "tensor/tensors.h"
 #include "operation/variable.h"
 #include "operation/constant.h"
 #include "operation/addition.h"
@@ -153,24 +152,6 @@ Tensor::Tensor(const Tensor *origin, std::vector<unsigned int> idx) : dims(origi
     }
 }
 
-Tensor::Tensor(const Tensors *origin, std::vector<unsigned int> dims) : dims(dims)
-{
-    counter += 1;
-    static unsigned int c = 0;
-    c+=1;
-    name = "merge" + std::to_string(c);
-    len = calculateLen();
-    this->content = new Number*[len];
-    unsigned int idx = 0;
-    for (unsigned int i = 0; i < origin->size(); i++) {
-        Tensor *tmp = origin->get(i);
-        for (unsigned int j = 0; j < tmp->len; j++) {
-            content[idx] = NULL;
-            setContent(idx, tmp->content[j]);
-            idx += 1;
-        }
-    }
-}
 
 Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tensor(dims)
 {
@@ -283,9 +264,6 @@ Tensor *Tensor::gather(std::vector<unsigned int> idx) const {
     return new Tensor(this, idx);
 }
 
-Tensors *Tensor::split(unsigned int splitAxis) const {
-    return new Tensors(this, splitAxis);
-}
 
 Tensor Tensor::getTmp(unsigned int idx) const {
     if (dims.size() == 0)

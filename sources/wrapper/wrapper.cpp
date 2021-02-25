@@ -1,5 +1,5 @@
 #ifdef PYTHON_WRAPPER
-#include "tensor/tensors.h"
+#include "tensor/tensor.h"
 #include "operation/variable.h"
 
 char const* greet()
@@ -96,38 +96,12 @@ BOOST_PYTHON_MODULE(koishi)
         .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
         .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
         .def("gather", &Tensor::gatherFromList, return_value_policy<manage_new_object>())
-        .def("split", &Tensor::split, return_value_policy<manage_new_object>())
         .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
         .def("gradientReinit", &Tensor::gradientReinit)
         .def("show", &Tensor::printGradient)
 
         .add_property("name", &Tensor::getName, &Tensor::setName)
-    ;
-
-    class_<Tensors>("Tensors", no_init)
-        .def("__str__", &Tensors::__str__)
-        .def("sigmoid", &Tensors::sigmoid, return_value_policy<manage_new_object>())
-        .def("log", &Tensors::log, return_value_policy<manage_new_object>())
-        .def("mean", &Tensors::mean, return_value_policy<manage_new_object>())
-        .def("max", &Tensors::max, return_value_policy<manage_new_object>())
-        .def("min", &Tensors::min, return_value_policy<manage_new_object>())
-        .def("range", &Tensors::range, return_value_policy<manage_new_object>())
-        .def("add", &Tensors::addRaw, return_value_policy<manage_new_object>())
-        .def("add", &Tensors::addTensor, return_value_policy<manage_new_object>())
-        .def("add", &Tensors::add, return_value_policy<manage_new_object>())
-        .def("multiply", &Tensors::multiplyRaw, return_value_policy<manage_new_object>())
-        .def("multiply", &Tensors::multiplyTensor, return_value_policy<manage_new_object>())
-        .def("multiply", &Tensors::multiply, return_value_policy<manage_new_object>())
-        .def("divide", &Tensors::divideRaw, return_value_policy<manage_new_object>())
-        .def("divide", &Tensors::divideTensor, return_value_policy<manage_new_object>())
-        .def("divide", &Tensors::divide, return_value_policy<manage_new_object>())
-        .def("substract", &Tensors::substractRaw, return_value_policy<manage_new_object>())
-        .def("substract", &Tensors::substractTensor, return_value_policy<manage_new_object>())
-        .def("substract", &Tensors::substract, return_value_policy<manage_new_object>())
-        .def("__getitem__", &Tensors::get, return_value_policy<manage_new_object>())
-        .def("merge", &Tensors::mergeFromList, return_value_policy<manage_new_object>())
-        .def("take", &Tensors::takeFromList, return_value_policy<manage_new_object>())
     ;
 }
 

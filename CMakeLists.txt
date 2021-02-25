@@ -39,7 +39,6 @@ sources/operation/transformation.cpp
 sources/operation/variable.cpp
 sources/tensor/tensor.cpp
 sources/tensor/tensorException.cpp
-sources/tensor/tensors.cpp
 sources/wrapper/wrapper.cpp
 sources/wrapper/wrapperTools.cpp
 )

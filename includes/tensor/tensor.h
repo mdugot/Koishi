@@ -8,7 +8,6 @@
 #include "initializer/initializer.h"
 
 class Sum;
-class Tensors;
 #ifdef PYTHON_WRAPPER
 class InitializerWrapper;
 #endif
@@ -39,7 +38,6 @@ class Tensor {
         Tensor(const Tensor *origin, unsigned int idx);
         Tensor(const Tensor *origin);
         Tensor(const Tensor *origin, std::vector<unsigned int> idx);
-        Tensor(const Tensors *origin, std::vector<unsigned int> dims);
         ~Tensor();
 
         inline Tensor* clone() {return new Tensor(this);}
@@ -63,7 +61,6 @@ class Tensor {
         Tensor *operator[](unsigned int idx) const;
         Tensor *get(unsigned int idx) const;
         Tensor *gather(std::vector<unsigned int> idx) const;
-        Tensors *split(unsigned int splitAxis) const;
         Tensor *add(const Tensor &tensor) const;
         Tensor *pow(const Tensor &tensor) const;
         Tensor *multiply(const Tensor &tensor) const;
