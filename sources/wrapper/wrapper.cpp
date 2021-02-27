@@ -58,8 +58,22 @@ BOOST_PYTHON_MODULE(koishi)
         .def("feed", &FeedWrapper::feedNumpy)
     ;
 
+    Tensor *(Tensor::*sum_1)(unsigned int) const = &Tensor::sum;
+    Tensor *(Tensor::*sum_2)() const = &Tensor::sum;
+    Tensor *(Tensor::*count_1)(unsigned int) const = &Tensor::count;
+    Tensor *(Tensor::*count_2)() const = &Tensor::count;
+    Tensor *(Tensor::*std_1)(unsigned int) const = &Tensor::std;
+    Tensor *(Tensor::*std_2)() const = &Tensor::std;
+    Tensor *(Tensor::*max_1)(unsigned int) const = &Tensor::max;
+    Tensor *(Tensor::*max_2)() const = &Tensor::max;
+    Tensor *(Tensor::*min_1)(unsigned int) const = &Tensor::min;
+    Tensor *(Tensor::*min_2)() const = &Tensor::min;
+    Tensor *(Tensor::*range_1)(unsigned int) const = &Tensor::range;
+    Tensor *(Tensor::*range_2)() const = &Tensor::range;
     Tensor *(Tensor::*mean_1)(unsigned int) const = &Tensor::mean;
     Tensor *(Tensor::*mean_2)() const = &Tensor::mean;
+    Tensor *(Tensor::*softmax_1)(unsigned int) const = &Tensor::softmax;
+    Tensor *(Tensor::*softmax_2)() const = &Tensor::softmax;
 
     class_<Tensor>("Tensor", init<FLOAT>())
         //.def(init<list&, list&>())
@@ -67,15 +81,23 @@ BOOST_PYTHON_MODULE(koishi)
         .def(init<boost::python::list&>())
         .def("__str__", &Tensor::__str__)
         .def("eval", &Tensor::evalForPython)
-        .def("sum", &Tensor::sum, return_value_policy<manage_new_object>())
-        .def("count", &Tensor::count, return_value_policy<manage_new_object>())
+        .def("sum", sum_1, return_value_policy<manage_new_object>())
+        .def("sum", sum_2, return_value_policy<manage_new_object>())
+        .def("count", count_1, return_value_policy<manage_new_object>())
+        .def("count", count_2, return_value_policy<manage_new_object>())
         .def("mean", mean_1, return_value_policy<manage_new_object>())
         .def("mean", mean_2, return_value_policy<manage_new_object>())
-        .def("std", &Tensor::std, return_value_policy<manage_new_object>())
+        .def("softmax", softmax_1, return_value_policy<manage_new_object>())
+        .def("softmax", softmax_2, return_value_policy<manage_new_object>())
+        .def("std", std_1, return_value_policy<manage_new_object>())
+        .def("std", std_2, return_value_policy<manage_new_object>())
         .def("percentile", &Tensor::percentile, return_value_policy<manage_new_object>())
-        .def("min", &Tensor::min, return_value_policy<manage_new_object>())
-        .def("max", &Tensor::max, return_value_policy<manage_new_object>())
-        .def("range", &Tensor::range, return_value_policy<manage_new_object>())
+        .def("min", min_1, return_value_policy<manage_new_object>())
+        .def("min", min_2, return_value_policy<manage_new_object>())
+        .def("max", max_1, return_value_policy<manage_new_object>())
+        .def("max", max_2, return_value_policy<manage_new_object>())
+        .def("range", range_1, return_value_policy<manage_new_object>())
+        .def("range", range_2, return_value_policy<manage_new_object>())
         .def("add", &Tensor::add, return_value_policy<manage_new_object>())
         .def("add", &Tensor::addRaw, return_value_policy<manage_new_object>())
         .def("substract", &Tensor::substract, return_value_policy<manage_new_object>())

@@ -696,6 +696,7 @@ Tensor *Tensor::percentile(FLOAT percent) const {
     return result;
 }
 
+
 Tensor *Tensor::std() const {
     Tensor *squareDiff = substract(*mean())->powRaw(2);
     return squareDiff->sum()->divide(*count())->powRaw(0.5);

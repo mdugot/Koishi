@@ -72,8 +72,11 @@ class Tensor {
         Tensor *exp() const;
         Tensor *log() const;
         Tensor *sum() const;
+        inline Tensor *sum(unsigned int dim) const {return foreach(dim, &Tensor::sum);}
         Tensor *count() const;
+        inline Tensor *count(unsigned int dim) const {return foreach(dim, &Tensor::count);}
         Tensor *std() const;
+        inline Tensor *std(unsigned int dim) const {return foreach(dim, &Tensor::std);}
         Tensor *matmul(const Tensor &tensor) const;
         Tensor *minorXY(unsigned int X, unsigned int Y) const;
         Tensor *determinant() const;
@@ -81,6 +84,7 @@ class Tensor {
         Tensor *matinv() const;
         Tensor *transpose(std::vector<unsigned int>permutations) const;
         Tensor *percentile(FLOAT percent) const;
+
 
         inline Tensor *addRaw(FLOAT rawValue) const {return add(Tensor(rawValue));}
         inline Tensor *powRaw(FLOAT rawValue) const {return pow(Tensor(rawValue));}
@@ -90,10 +94,15 @@ class Tensor {
         inline Tensor *substract(const Tensor &tensor) const {return add(*tensor.multiply(-1));}
         inline Tensor *substractRaw(FLOAT rawValue) const {return substract(Tensor(rawValue));}
         inline Tensor *max() const {return percentile(100);}
+        inline Tensor *max(unsigned int dim) const {return foreach(dim, &Tensor::max);}
         inline Tensor *min() const {return percentile(0);}
+        inline Tensor *min(unsigned int dim) const {return foreach(dim, &Tensor::min);}
         inline Tensor *range() const {return max()->substract(*min());}
+        inline Tensor *range(unsigned int dim) const {return foreach(dim, &Tensor::range);}
         inline Tensor *mean() const {return sum()->divide(*count());}
         inline Tensor *mean(unsigned int dim) const {return foreach(dim, &Tensor::mean);}
+        inline Tensor *softmax() const {return this->exp()->divide(this->exp()->sum());}
+        inline Tensor *softmax(unsigned int dim) const {return foreach(dim, &Tensor::softmax);}
 
         void gradientReinit();
         void gradientUpdate();
