@@ -74,6 +74,8 @@ BOOST_PYTHON_MODULE(koishi)
     Tensor *(Tensor::*mean_2)() const = &Tensor::mean;
     Tensor *(Tensor::*softmax_1)(unsigned int) const = &Tensor::softmax;
     Tensor *(Tensor::*softmax_2)() const = &Tensor::softmax;
+    Tensor *(Tensor::*get_1)(unsigned int) const = &Tensor::get;
+    Tensor *(Tensor::*get_2)(Tensor*) const = &Tensor::get;
 
     class_<Tensor>("Tensor", init<FLOAT>())
         //.def(init<list&, list&>())
@@ -120,7 +122,10 @@ BOOST_PYTHON_MODULE(koishi)
         .def("minorMatrix", &Tensor::minorMatrix, return_value_policy<manage_new_object>())
         .def("matinv", &Tensor::matinv, return_value_policy<manage_new_object>())
         .def("shape", &Tensor::shape, return_value_policy<manage_new_object>())
-        .def("__getitem__", &Tensor::get, return_value_policy<manage_new_object>())
+        .def("get", get_1, return_value_policy<manage_new_object>())
+        .def("__getitem__", get_1, return_value_policy<manage_new_object>())
+        .def("get", get_2, return_value_policy<manage_new_object>())
+        .def("__getitem__", get_2, return_value_policy<manage_new_object>())
         .def("gather", &Tensor::gatherFromList, return_value_policy<manage_new_object>())
         .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)

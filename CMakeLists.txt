@@ -20,6 +20,7 @@ sources/initializer/feed.cpp
 sources/initializer/fill.cpp
 sources/initializer/initializer.cpp
 sources/initializer/uniform.cpp
+sources/operation/get.cpp
 sources/operation/addition.cpp
 sources/operation/constant.cpp
 sources/operation/count.cpp

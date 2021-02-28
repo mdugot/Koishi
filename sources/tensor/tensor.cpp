@@ -1,4 +1,5 @@
 #include "tensor/tensor.h"
+#include "operation/get.h"
 #include "operation/variable.h"
 #include "operation/constant.h"
 #include "operation/addition.h"
@@ -186,7 +187,16 @@ Tensor::Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values) : Tens
         throw TensorException("values of initialization must be a divisor of the len of tensor", this);
 }
 
-Tensor::Tensor(FLOAT value) : Tensor(std::vector<unsigned int>(), {value})
+Tensor::Tensor(std::vector<unsigned int> dims, std::vector<Number*> values) : Tensor(dims)
+{
+    for (unsigned int i = 0; i < len; i++) {
+        setContent(i, values[i % values.size()]);
+    }
+    if (len % values.size() != 0)
+        throw TensorException("values of initialization must be a divisor of the len of tensor", this);
+}
+
+Tensor::Tensor(FLOAT value) : Tensor(std::vector<unsigned int>(), std::vector<FLOAT>(1, value))
 {
 }
 
@@ -742,3 +752,24 @@ Tensor *Tensor::foreach(unsigned int from_dim, Tensor *(Tensor::*op)() const) co
      return new Tensor(tensors);
 }
 
+Tensor *Tensor::get(Tensor *indexs) const {
+    if (indexs->dims.size() != dims.size() - 1)
+       throw TensorException("get indexs must have the same shape than the original tensor minus the last dimension", this);
+    if (dims.size() == 1) {
+        if (indexs->len != 1) {
+            throw TensorException("get indexs error", this);
+        }
+        std::vector<Number*> vector;
+        for (int i = 0; i < dims[0]; i++) {
+            vector.push_back(content[i]);
+        }
+        return new Tensor(new Get(vector, indexs->content[0]));
+    }
+    if (indexs->dims[0] != dims[0])
+       throw TensorException("get indexs must have the same shape than the original tensor minus the last dimension", this);
+     std::vector<Tensor*> tensors;
+     for (int idx = 0; idx < dims[0]; idx++) {
+        tensors.push_back(get(idx)->get(indexs->get(idx)));
+     }
+     return new Tensor(tensors);
+}

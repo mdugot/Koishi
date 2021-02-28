@@ -34,6 +34,7 @@ class Tensor {
         Tensor(FLOAT value);
         Tensor(Number* value);
         Tensor(std::vector<unsigned int> dims, std::vector<FLOAT> values);
+        Tensor(std::vector<unsigned int> dims, std::vector<Number*> values);
         Tensor(std::string group, Initializer *initializer);
         Tensor(std::vector<unsigned int> dims, std::string group, Initializer *initializer);
         Tensor(const Tensor *origin, unsigned int idx);
@@ -62,6 +63,7 @@ class Tensor {
         Tensor *shape();
         Tensor *operator[](unsigned int idx) const;
         Tensor *get(unsigned int idx) const;
+        Tensor *get(Tensor *indexs) const;
         Tensor *gather(std::vector<unsigned int> idx) const;
         Tensor *add(const Tensor &tensor) const;
         Tensor *pow(const Tensor &tensor) const;
