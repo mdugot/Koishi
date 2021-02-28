@@ -2,7 +2,6 @@ import koishi
 import numpy as np
 import pandas
 from sklearn.datasets import fetch_kddcup99
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 
 print('downloading the dataset...')
@@ -22,10 +21,7 @@ print('data ready !')
 nfeatures = int(data.shape[1])
 nclasses = int(target.max() + 1)
 hidden_layer = 128
-
 batch_size = 100
-
-epoch = 1
 
 learning_rate = 0.0002
 momentum = 0.9
@@ -69,7 +65,7 @@ try:
         loss_history.append(running_loss)
         acc_history.append(running_acc)
         loss.backpropagation()
-        koishi.adamOptim(learning_rate, momentum, rms)
+        koishi.adamOptim('param', learning_rate, momentum, rms)
 except KeyboardInterrupt:
     pass
 
