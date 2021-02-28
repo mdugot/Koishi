@@ -130,3 +130,9 @@ for batch_idx in range(len(data) // batch_size):
     loss.backpropagation()
     koishi.adamOptim('param', learning_rate, momentum, rms)
 ```
+
+Soon after 100 steps of training, the accuracy of the model should get close of 99%. The full code with the accuracy metric and the matplotlib summaries can be found [here](https://github.com/mdugot/Koishi/blob/master/example.py).
+
+<p align="center">
+  <img src="https://github.com/mdugot/Koishi/blob/master/koishi_example.png" />
+</p>
