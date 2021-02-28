@@ -56,7 +56,6 @@ import koishi
 import numpy as np
 import pandas
 from sklearn.datasets import fetch_kddcup99
-from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 ```
 
@@ -114,3 +113,20 @@ forward = inputs.matmul(w1).add(b1).sigmoid().matmul(w2).add(b2).softmax(1)
 loss = forward.get(labels).log().negative().mean()
 ```
 
+Before to start the training, we need to call `koishi.initializeAll` to initialize the weigths and bias of our model with the uniform initializer.
+
+```
+koishi.initializeAll()
+```
+
+We can now run the train loop that will consist of feeding the current batch to the model, calling the `loss.backpropagation` method to compute the gradient of our loss function, and calling `koishi.adamOptim` to update the weigths and bias of our model according to their gradient with the adam optimizer.
+
+```
+for batch_idx in range(len(data) // batch_size):
+    start = batch_idx*batch_size
+    end = (batch_idx + 1)*batch_size
+    feed_inputs.feed(data[start:end])
+    feed_labels.feed(target[start:end])
+    loss.backpropagation()
+    koishi.adamOptim('param', learning_rate, momentum, rms)
+```
