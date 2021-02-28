@@ -65,7 +65,7 @@ try:
         true_labels = labels.eval()
         running_loss = loss.mean().eval()
         running_acc = (predictions == true_labels).sum() / batch_size
-        print(f"[{batch_idx*batch_size}/{len(data):.4}] Loss : {running_loss}, Accuracy : {running_acc:.2}       ", end='\r')
+        print(f"[{batch_idx*batch_size}/{len(data)}] Loss : {running_loss:.4}, Accuracy : {running_acc:.2}       ", end='\r')
         loss_history.append(running_loss)
         acc_history.append(running_acc)
         loss.backpropagation()
