@@ -5,6 +5,7 @@
 #include "operation/addition.h"
 #include "operation/inverse.h"
 #include "operation/sigmoid.h"
+#include "operation/cosine.h"
 #include "operation/exp.h"
 #include "operation/log.h"
 #include "operation/multiplication.h"
@@ -489,6 +490,28 @@ Tensor *Tensor::sigmoid() const {
     }
     c+=1;
     result->name = "sigmoid" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::sin() const {
+    static unsigned int c = 0;
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Sinus(content[i]));
+    }
+    c+=1;
+    result->name = "sinus" + std::to_string(c);
+    return result;
+}
+
+Tensor *Tensor::cos() const {
+    static unsigned int c = 0;
+    Tensor *result = new Tensor(dims);
+    for (unsigned int i = 0; i < len; i++) {
+        result->setContent(i, new Cosinus(content[i]));
+    }
+    c+=1;
+    result->name = "cosinus" + std::to_string(c);
     return result;
 }
 

@@ -71,6 +71,8 @@ class Tensor {
         Tensor *inverse() const;
         Tensor *negative() const;
         Tensor *sigmoid() const;
+        Tensor *sin() const;
+        Tensor *cos() const;
         Tensor *exp() const;
         Tensor *log() const;
         Tensor *sum() const;
