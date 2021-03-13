@@ -28,14 +28,13 @@ momentum = 0.9
 rms = 0.9
 
 print("make initializer...")
-feed_inputs = koishi.feedInitializer([batch_size, nfeatures])
-feed_labels = koishi.feedInitializer([batch_size])
 init = koishi.uniformInitializer(-0.1,0.1)
 
-print("create model parameters...")
-inputs = koishi.Variable('inputs', feed_inputs)
-labels = koishi.Variable('labels', feed_labels)
+print("make feeders...")
+inputs = koishi.Feeder('inputs', [batch_size, nfeatures])
+labels = koishi.Feeder('labels', [batch_size])
 
+print("make variables...")
 w1 = koishi.Variable([nfeatures, hidden_layer], 'param', init)
 w2 = koishi.Variable([hidden_layer, nclasses], 'param', init)
 b1 = koishi.Variable([hidden_layer], 'param', init)
@@ -55,8 +54,7 @@ try:
     for batch_idx in range(len(data) // batch_size):
         start = batch_idx*batch_size
         end = (batch_idx + 1)*batch_size
-        feed_inputs.feed(data[start:end])
-        feed_labels.feed(target[start:end])
+        koishi.feed(inputs=data[start:end], labels=target[start:end])
         predictions = np.argmax(forward.eval(), axis=1)
         true_labels = labels.eval()
         running_loss = loss.mean().eval()

@@ -20,9 +20,10 @@ BOOST_PYTHON_MODULE(koishi)
     def("saveAll", &Variable::saveAll);
     def("load", &Variable::load);
 
+    def("Feeder", getFeedInitializer, return_value_policy<manage_new_object>());
+    def("Feeder", getFeedInitializerFromList, return_value_policy<manage_new_object>());
+    def("feed", raw_function(rawFeed));
     def("uniformInitializer", getUniformInitializer, return_value_policy<manage_new_object>());
-    def("feedInitializer", getFeedInitializer, return_value_policy<manage_new_object>());
-    def("feedInitializer", getFeedInitializerFromList, return_value_policy<manage_new_object>());
     def("fillInitializer", getFillInitializer, return_value_policy<manage_new_object>());
 
     def("gradientDescentOptim", Number::optimizeByGradientDescent);
@@ -52,10 +53,14 @@ BOOST_PYTHON_MODULE(koishi)
     class_<InitializerWrapper>("Initializer", no_init)
         .def("init", &InitializerWrapper::init)
     ;
+
+    void (FeedWrapper::*feed_1)(boost::python::list &values) = &FeedWrapper::feed;
+    void (FeedWrapper::*feed_2)(FLOAT value) = &FeedWrapper::feed;
+    void (FeedWrapper::*feed_3)(boost::python::numpy::ndarray &a) = &FeedWrapper::feed;
     class_<FeedWrapper, bases<InitializerWrapper>>("Feed", no_init)
-        .def("feed", &FeedWrapper::feed)
-        .def("feed", &FeedWrapper::feedSimple)
-        .def("feed", &FeedWrapper::feedNumpy)
+        .def("feed", feed_1)
+        .def("feed", feed_2)
+        .def("feed", feed_3)
     ;
 
     Tensor *(Tensor::*sum_1)(unsigned int) const = &Tensor::sum;
@@ -82,7 +87,8 @@ BOOST_PYTHON_MODULE(koishi)
         .def(init<np::ndarray&>())
         .def(init<boost::python::list&>())
         .def("__str__", &Tensor::__str__)
-        .def("eval", &Tensor::evalForPython)
+        .def("eval", raw_function(&Tensor::rawEval, 1))
+        .def("backpropagation", raw_function(&Tensor::rawPropagation, 1))
         .def("sum", sum_1, return_value_policy<manage_new_object>())
         .def("sum", sum_2, return_value_policy<manage_new_object>())
         .def("count", count_1, return_value_policy<manage_new_object>())
@@ -127,7 +133,6 @@ BOOST_PYTHON_MODULE(koishi)
         .def("get", get_2, return_value_policy<manage_new_object>())
         .def("__getitem__", get_2, return_value_policy<manage_new_object>())
         .def("gather", &Tensor::gatherFromList, return_value_policy<manage_new_object>())
-        .def("backpropagation", &Tensor::gradientUpdate)
         .def("gradientChecking", &Tensor::gradientChecking)
         .def("gradientReinit", &Tensor::gradientReinit)
         .def("show", &Tensor::printGradient)

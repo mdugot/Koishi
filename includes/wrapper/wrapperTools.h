@@ -29,18 +29,23 @@ class InitializerWrapper {
 class FeedWrapper : public InitializerWrapper {
 
     public:
+        static std::map<std::string, FeedWrapper*> dict;
+        std::string name;
         Feed *feeder;
-        FeedWrapper(Feed* initializer);
+
+        FeedWrapper(std::string name, Feed* initializer);
         virtual ~FeedWrapper();
         void feed(list &values);
-        void feedSimple(FLOAT value);
-        void feedNumpy(np::ndarray &a);
+        void feed(FLOAT value);
+        void feed(np::ndarray &a);
 };
 
 InitializerWrapper *getUniformInitializer(FLOAT min, FLOAT max);
 InitializerWrapper *getFillInitializer(FLOAT value);
-FeedWrapper *getFeedInitializer();
-FeedWrapper *getFeedInitializerFromList(list &l);
+Tensor *getFeedInitializer(std::string name);
+Tensor *getFeedInitializerFromList(std::string name, list &l);
+void feedKwargs(dict &feeds);
+object rawFeed(tuple args, dict kwargs);
 std::vector<FLOAT> numpyToVector(np::ndarray &a);
 std::vector<unsigned int> getNumpyShape(np::ndarray &a);
 std::vector<unsigned int> getListShape(list &l);

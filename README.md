@@ -86,20 +86,21 @@ momentum = 0.9
 rms = 0.9
 ```
 
-Let's create a `koishi.uniformInitializer` to initialize the parameters of our model and some `koishi.feedInitializer` to feed the data to the model.
+Let's create a `koishi.uniformInitializer` to initialize the parameters of our model.
 
 ```
-feed_inputs = koishi.feedInitializer([batch_size, nfeatures])
-feed_labels = koishi.feedInitializer([batch_size])
 init = koishi.uniformInitializer(-0.1,0.1)
 ```
 
-Let's create the variables of our models. The variables corresping to the data feeded to the model will be initialized by the feed initializer while the learnable variables (the weights and the bias) will be initialized by the uniform initializer.
+Let's use `koishi.Feeder` to define the tensors that can be feeded to the model.
+```
+inputs = koishi.Feeder('inputs', [batch_size, nfeatures])
+labels = koishi.Feeder('labels', [batch_size])
+```
+
+Let's create the learnable variables with `koishi.Variable` (the weights and the bias) of our models and define their initiliazer with the previously created uniform initializer.
 
 ```
-inputs = koishi.Variable('inputs', feed_inputs)
-labels = koishi.Variable('labels', feed_labels)
-
 w1 = koishi.Variable([nfeatures, hidden_layer], 'param', init)  # weigths of the first layer
 w2 = koishi.Variable([hidden_layer, nclasses], 'param', init)   # weights of the second layer
 b1 = koishi.Variable([hidden_layer], 'param', init)             # bias of the first layer
@@ -125,8 +126,7 @@ We can now run the train loop that will consist of feeding the current batch to 
 for batch_idx in range(len(data) // batch_size):
     start = batch_idx*batch_size
     end = (batch_idx + 1)*batch_size
-    feed_inputs.feed(data[start:end])
-    feed_labels.feed(target[start:end])
+    koishi.feed(inputs=data[start:end], labels=target[start:end])
     loss.backpropagation()
     koishi.adamOptim('param', learning_rate, momentum, rms)
 ```

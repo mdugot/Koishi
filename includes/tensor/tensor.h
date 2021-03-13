@@ -121,7 +121,9 @@ class Tensor {
         Tensor(std::string group, FLOAT value);
         Tensor(std::string group, boost::python::numpy::ndarray &a);
         Tensor(std::string group, boost::python::list &list);
-        boost::python::object evalForPython();
+        static object rawPropagation(tuple args, dict kwargs);
+        static object rawEval(tuple args, dict kwargs);
+        boost::python::object evalForPython(dict &feeders);
         Tensor *transposeFromList(list& permutations);
         Tensor *gatherFromList(list& permutations);
         #endif

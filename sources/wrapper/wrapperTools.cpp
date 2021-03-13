@@ -5,6 +5,10 @@
 #include "initializer/uniform.h"
 #include "initializer/feed.h"
 
+
+std::map<std::string, FeedWrapper*> FeedWrapper::dict = std::map<std::string, FeedWrapper*>();
+
+
 InitializerWrapper::InitializerWrapper(Initializer *initializer) :initializer(initializer)
 {
 }
@@ -17,22 +21,26 @@ void InitializerWrapper::init() {
     initializer->init();
 }
 
-FeedWrapper::FeedWrapper(Feed *feeder) :InitializerWrapper(feeder), feeder(feeder)
+FeedWrapper::FeedWrapper(std::string name, Feed *feeder) :InitializerWrapper(feeder), feeder(feeder), name(name)
 {
+    if (dict.count(name) > 0)
+        throw TensorException("feeder named " + name + " already exist");
+    dict[name] = this;
 }
 
 FeedWrapper::~FeedWrapper() {
+    dict.erase(name);
 }
 
 void FeedWrapper::feed(list &l) {
     feeder->feed(getListShape(l), listToVector_deep<FLOAT>(l));
 }
 
-void FeedWrapper::feedSimple(FLOAT value) {
+void FeedWrapper::feed(FLOAT value) {
     feeder->feed({}, {value});
 }
 
-void FeedWrapper::feedNumpy(np::ndarray &a) {
+void FeedWrapper::feed(np::ndarray &a) {
     std::vector<unsigned int> dims = getNumpyShape(a);
     std::vector<FLOAT> values = numpyToVector(a);
     feeder->feed(dims, values);
@@ -46,24 +54,83 @@ InitializerWrapper *getFillInitializer(FLOAT value) {
     return new InitializerWrapper(new Fill(value));
 }
 
-FeedWrapper *getFeedInitializer() {
-    return new FeedWrapper(new Feed(std::vector<unsigned int>()));
+Tensor *getFeedInitializer(std::string name) {
+    FeedWrapper* wrapper = new FeedWrapper(name, new Feed(std::vector<unsigned int>()));
+    Tensor *tensor = new Tensor(name, *wrapper);
+    return tensor;
 }
 
-FeedWrapper *getFeedInitializerFromList(list &l) {
-    return new FeedWrapper(new Feed(listToVector<unsigned int>(l)));
+Tensor *getFeedInitializerFromList(std::string name, list &l) {
+    FeedWrapper* wrapper = new FeedWrapper(name, new Feed(listToVector<unsigned int>(l)));
+    Tensor *tensor = new Tensor(name, *wrapper);
+    return tensor;
 }
 
 void saveListGroups(std::string filename, list &l) {
     Variable::saveGroups(filename, listToVector<std::string>(l));
 }
 
-object Tensor::evalForPython() {
+void feedKwargs(dict &feeds) {
+    for (int i = 0; i < boost::python::len(feeds); i++) {
+        std::string name(extract<const char*>(feeds.keys()[i]));
+        if (FeedWrapper::dict.count(name) == 0) {
+            throw TensorException("unknown feed " + name);
+        }
+        extract<object> objectExtractor(feeds.values()[i]);
+        object o=objectExtractor();
+        std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
+        if (classname == "int" || classname == "float") {
+            FeedWrapper::dict[name]->feed(extract<FLOAT>(feeds.values()[i]));
+        }
+        else if (classname == "list") {
+            list l = extract<list>(feeds.values()[i]);
+            FeedWrapper::dict[name]->feed(l);
+        }
+        else if (classname == "ndarray") {
+            np::ndarray a = extract<np::ndarray>(feeds.values()[i]);
+            FeedWrapper::dict[name]->feed(a);
+        }
+        else {
+            throw TensorException("unknown feed type " + classname);
+        }
+    }
+}
+
+object rawFeed(tuple args, dict kwargs) {
+    if (boost::python::len(args) != 0) {
+        throw TensorException("feed only accept keyed argument for feeding");
+    }
+    feedKwargs(kwargs);
+    return object();
+}
+
+object Tensor::rawEval(tuple args, dict kwargs) {
+    if (boost::python::len(args) != 1) {
+        throw TensorException("eval only accept keyed argument for feeding");
+    }
+    Tensor& self = extract<Tensor&>(args[0]);
+    return self.evalForPython(kwargs);
+}
+
+object Tensor::rawPropagation(tuple args, dict kwargs) {
+    if (boost::python::len(args) != 1) {
+        throw TensorException("backpropagation only accept keyed argument for feeding");
+    }
+    feedKwargs(kwargs);
+    Tensor& self = extract<Tensor&>(args[0]);
+    self.gradientUpdate();
+    return object();
+}
+
+
+object Tensor::evalForPython(dict &feeds) {
+    feedKwargs(feeds);
     if (dims.size() == 0)
         return object(content[0]->eval());
     list result;
     for (unsigned int i = 0; i < dims[0]; i++) {
-        result.append(getTmp(i).evalForPython());
+        dict empty = dict();
+        result.append(getTmp(i).evalForPython(empty));
     }
     return result;
 }
