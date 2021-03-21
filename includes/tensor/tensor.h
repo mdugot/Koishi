@@ -81,6 +81,7 @@ class Tensor {
         inline Tensor *count(unsigned int dim) const {return foreach(dim, &Tensor::count);}
         Tensor *std() const;
         inline Tensor *std(unsigned int dim) const {return foreach(dim, &Tensor::std);}
+        Tensor *vector_matmul(const Tensor &tensor) const;
         Tensor *matmul(const Tensor &tensor) const;
         Tensor *minorXY(unsigned int X, unsigned int Y) const;
         Tensor *determinant() const;
@@ -125,6 +126,8 @@ class Tensor {
         Tensor(std::string group, boost::python::list &list);
         static object rawPropagation(tuple args, dict kwargs);
         static object rawEval(tuple args, dict kwargs);
+        static Tensor* concatenate(boost::python::list &list);
+        static Tensor* stack(boost::python::list &list);
         boost::python::object evalForPython(dict &feeders);
         Tensor *transposeFromList(list& permutations);
         Tensor *gatherFromList(list& permutations);

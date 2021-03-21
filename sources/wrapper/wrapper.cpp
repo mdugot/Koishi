@@ -49,6 +49,8 @@ BOOST_PYTHON_MODULE(koishi)
     def("Variable", newVariableNumberWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableNumpyWithGroup, return_value_policy<manage_new_object>());
     def("Variable", newVariableListWithGroup, return_value_policy<manage_new_object>());
+    def("concatenate", Tensor::concatenate, return_value_policy<manage_new_object>());
+    def("stack", Tensor::stack, return_value_policy<manage_new_object>());
 
     class_<InitializerWrapper>("Initializer", no_init)
         .def("init", &InitializerWrapper::init)
@@ -87,6 +89,7 @@ BOOST_PYTHON_MODULE(koishi)
         .def(init<np::ndarray&>())
         .def(init<boost::python::list&>())
         .def("__str__", &Tensor::__str__)
+        .def("__call__", raw_function(&Tensor::rawEval, 1))
         .def("eval", raw_function(&Tensor::rawEval, 1))
         .def("backpropagation", raw_function(&Tensor::rawPropagation, 1))
         .def("sum", sum_1, return_value_policy<manage_new_object>())

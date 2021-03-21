@@ -537,10 +537,55 @@ Tensor *Tensor::log() const {
     return result;
 }
 
+Tensor *Tensor::vector_matmul(const Tensor &tensor) const {
+    static unsigned int c = 0;
+
+    if (dims.size() != 1 || tensor.dims.size() != 2)
+        throw TensorException(
+            "Matrix multiplication of a vector can only be done with 2 dimensional matrix and 1 dimensional vector",
+            this, &tensor);
+    if (dims[0] != tensor.dims[0])
+        throw TensorException("Matrix multiplication dimensions doesn't match", this, &tensor);
+    std::vector<unsigned int> new_dims;
+    new_dims.push_back(tensor.dims[1]);
+    Tensor *result = new Tensor(new_dims);
+    for (unsigned int j = 0; j < tensor.dims[1]; j++) {
+        std::vector<Number*> row;
+        for (unsigned int k = 0; k < dims[0]; k++) {
+            row.push_back(new Multiplication(at({k}), tensor.at({k, j})));
+        }
+        result->at({j}, new Sum(row));
+    }
+    c+=1;
+    result->name = "vmatmul" + std::to_string(c);
+    return result;
+}
+
 Tensor *Tensor::matmul(const Tensor &tensor) const {
     static unsigned int c = 0;
 
-    if (dims.size() != 2 || tensor.dims.size() != 2)
+    if (tensor.dims.size() < 2)
+        throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix", this, &tensor);
+    if (tensor.dims.size() > 2) {
+        if (dims[0] != tensor.dims[0])
+            throw TensorException("Unable to use matrix multiplication on tensors of different shapes", this, &tensor);
+        std::vector<Tensor*> tensors;
+        for (int idx = 0; idx < dims[0]; idx++) {
+           tensors.push_back(get(idx)->matmul(*tensor.get(idx)));
+        }
+        return new Tensor(tensors);
+    }
+    if (dims.size() > 2) {
+        std::vector<Tensor*> tensors;
+        for (int idx = 0; idx < dims[0]; idx++) {
+           tensors.push_back(get(idx)->matmul(tensor));
+        }
+        return new Tensor(tensors);
+    }
+    if (dims.size() == 1) {
+        return vector_matmul(tensor);
+    }
+    if (dims.size() != 2)
         throw TensorException("Matrix multiplication can only be done with 2 dimensional matrix", this, &tensor);
     if (dims[1] != tensor.dims[0])
         throw TensorException("Matrix multiplication dimensions doesn't match", this, &tensor);

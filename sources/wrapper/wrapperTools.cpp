@@ -122,6 +122,82 @@ object Tensor::rawPropagation(tuple args, dict kwargs) {
     return object();
 }
 
+Tensor* Tensor::concatenate(boost::python::list &list) {
+    if (boost::python::len(list) == 0) {
+        throw TensorException("try to concatenate empty list");
+    }
+    std::vector<Tensor*> tensors;
+    for (int i = 0; i < boost::python::len(list); i++) {
+        extract<object> objectExtractor(list[i]);
+        object o = objectExtractor();
+        std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
+        if (classname != "Tensor") {
+            throw TensorException("can only concatenate Tensor object");
+        }
+        Tensor& tensor = extract<Tensor&>(list[i]);
+        tensors.push_back(&tensor);
+    }
+    std::vector<unsigned int> dims;
+    std::vector<Number*> values;
+    dims.push_back(tensors.size());
+    for (int i = 0; i < tensors[0]->dims.size(); i++) {
+        dims.push_back(tensors[0]->dims[i]);
+    }
+    for (int i = 0; i < tensors.size(); i++) {
+        if (tensors[i]->dims.size() != tensors[0]->dims.size()) {
+            throw TensorException("can only concatenate Tensor of same shape");
+        }
+        for (int j = 0; j < tensors[0]->dims.size(); j++) {
+            if (tensors[i]->dims[j] != tensors[0]->dims[j]) {
+                throw TensorException("can only concatenate Tensor of same shape");
+            }
+        }
+        for (int j = 0; j < tensors[i]->len; j++) {
+            values.push_back(tensors[i]->content[j]);
+        }
+    }
+    return new Tensor(dims, values);
+}
+
+Tensor* Tensor::stack(boost::python::list &list) {
+    if (boost::python::len(list) == 0) {
+        throw TensorException("try to stack empty list");
+    }
+    std::vector<Tensor*> tensors;
+    for (int i = 0; i < boost::python::len(list); i++) {
+        extract<object> objectExtractor(list[i]);
+        object o = objectExtractor();
+        std::string classname = extract<std::string>(o.attr("__class__").attr("__name__"));
+        if (classname != "Tensor") {
+            throw TensorException("can only stack Tensor object");
+        }
+        Tensor& tensor = extract<Tensor&>(list[i]);
+        tensors.push_back(&tensor);
+    }
+    std::vector<unsigned int> dims;
+    std::vector<Number*> values;
+    for (int i = 0; i < tensors[0]->dims.size(); i++) {
+        dims.push_back(tensors[0]->dims[i]);
+    }
+    dims.push_back(tensors.size());
+    for (int j = 0; j < tensors[0]->len; j++) {
+        for (int i = 0; i < tensors.size(); i++) {
+            if (i == 0) {
+                if (tensors[i]->dims.size() != tensors[0]->dims.size()) {
+                    throw TensorException("can only stack Tensor of same shape");
+                }
+                for (int j = 0; j < tensors[0]->dims.size(); j++) {
+                    if (tensors[i]->dims[j] != tensors[0]->dims[j]) {
+                        throw TensorException("can only stack Tensor of same shape");
+                    }
+                }
+            }
+            values.push_back(tensors[i]->content[j]);
+        }
+    }
+    return new Tensor(dims, values);
+}
+
 
 object Tensor::evalForPython(dict &feeds) {
     feedKwargs(feeds);
